@@ -10,6 +10,7 @@ test_files([
     'clarion_examples/data_types.clw',
     'clarion_examples/file_io.clw',
     'clarion_examples/hello_world.clw',
+    'clarion_examples/prescription_form.clw',
     'clarion_examples/procedure_params.clw',
     'clarion_examples/queue_example.clw',
     'clarion_examples/report_example.clw',
@@ -24,13 +25,14 @@ interpreter_test_files([
     'clarion_examples/class_example.clw',
     'clarion_examples/control_flow.clw',
     'clarion_examples/data_types.clw',
-    'clarion_examples/file_io.clw',    
+    'clarion_examples/file_io.clw',
     'clarion_examples/hello_world.clw',
+    'clarion_examples/prescription_form.clw',
     'clarion_examples/procedure_params.clw',
     'clarion_examples/queue_example.clw',
     'clarion_examples/report_example.clw',
     'clarion_examples/sql_example.clw',
-    'clarion_examples/string_functions.clw',    
+    'clarion_examples/string_functions.clw',
     'clarion_examples/window_example.clw'
 ]).
 

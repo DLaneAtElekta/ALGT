@@ -175,6 +175,8 @@ keyword('PROMPT').
 keyword('ENTRY').
 keyword('BUTTON').
 keyword('SPIN').
+keyword('LIST').
+keyword('FORMAT').
 
 %------------------------------------------------------------
 % String literals (single quoted)

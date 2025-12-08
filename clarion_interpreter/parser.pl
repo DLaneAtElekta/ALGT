@@ -384,6 +384,21 @@ window_control(string_control(Text)) -->
     [rparen],
     skip_attributes.
 
+% GROUP control (container for other controls in window)
+window_control(group_control(Label, Controls)) -->
+    [keyword('GROUP')],
+    [lparen],
+    expression(Label),
+    [rparen],
+    skip_attributes,
+    window_controls(Controls),
+    end_keyword.
+
+% LIST control (in window)
+window_control(list_control) -->
+    [keyword('LIST')],
+    skip_attributes.
+
 %------------------------------------------------------------
 % Data types
 %------------------------------------------------------------
@@ -437,6 +452,7 @@ skip_attributes -->
 skip_attributes --> [].
 
 % Skip attribute keywords (but NOT structural keywords like CODE, END, etc.)
+skip_one_attr --> [keyword(K)], { \+ structural_keyword(K) }, [lparen], skip_parens_content, [rparen].
 skip_one_attr --> [keyword(K)], { \+ structural_keyword(K) }.
 skip_one_attr --> [identifier(_)], [lparen], skip_parens_content, [rparen].
 skip_one_attr --> [identifier(_)].
@@ -688,7 +704,11 @@ statements_acc(Acc, Stmts, In, Out) :-
     ( at_procedure_boundary(In)
     -> reverse(Acc, Stmts), Out = In
     ; ( phrase(statement(Stmt), In, Rest)
-      -> statements_acc([Stmt|Acc], Stmts, Rest, Out)
+      -> % Skip optional semicolon after statement
+         ( Rest = [semicolon|Rest2]
+         -> statements_acc([Stmt|Acc], Stmts, Rest2, Out)
+         ;  statements_acc([Stmt|Acc], Stmts, Rest, Out)
+         )
       ; reverse(Acc, Stmts), Out = In
       )
     ).
@@ -884,11 +904,11 @@ statement(accept(Body)) -->
     statements(Body),
     end_keyword.
 
-% SELECT statement (focus control)
-statement(select(Arg)) -->
+% SELECT statement (focus control) - can have 1 or 2 args: SELECT(?Control) or SELECT(?ListControl, Row)
+statement(select(Args)) -->
     [keyword('SELECT')],
     [lparen],
-    expression(Arg),
+    argument_list(Args),
     [rparen].
 
 % BEEP statement
