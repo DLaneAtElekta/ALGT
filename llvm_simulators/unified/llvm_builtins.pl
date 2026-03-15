@@ -61,6 +61,17 @@ llvm_builtin('llvm.maxnum.f64', [X, Y], R) :- R is max(X, Y).
 llvm_builtin('llvm.copysign.f64', [X, Y], R) :-
     ( Y >= 0 -> R is abs(X) ; R is -abs(X) ).
 
+% Fused multiply-add: a * b + c
+llvm_builtin('llvm.fmuladd.f64', [A, B, C], R) :- R is A * B + C.
+llvm_builtin('llvm.fmuladd.f32', [A, B, C], R) :- R is A * B + C.
+
+% Lifetime markers (no-ops for simulation)
+llvm_builtin('llvm.lifetime.start.p0', _, void).
+llvm_builtin('llvm.lifetime.end.p0', _, void).
+
+% Memset (no-op for simulation — memory is lazily initialized)
+llvm_builtin('llvm.memset.p0.i64', _, void).
+
 % ============================================================
 % C standard library stubs
 % ============================================================

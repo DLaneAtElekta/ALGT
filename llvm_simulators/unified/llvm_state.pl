@@ -19,6 +19,7 @@
     get_register/3,
     set_register/4,
     alloc_memory/3,
+    alloc_bytes/4,
     load_memory/3,
     store_memory/4,
     get_global/3,
@@ -85,6 +86,13 @@ alloc_memory(Addr,
     state(Regs, Mem, Addr, Gs, Fs, Out, Err, Prev, Tr),
     state(Regs, Mem, Next, Gs, Fs, Out, Err, Prev, Tr)) :-
     Next is Addr + 8.  % 8-byte aligned
+
+%% alloc_bytes(+Size, -Addr, +StateIn, -StateOut)
+%  Allocate Size bytes of memory, returning the base address.
+alloc_bytes(Size, Addr,
+    state(Regs, Mem, Addr, Gs, Fs, Out, Err, Prev, Tr),
+    state(Regs, Mem, Next, Gs, Fs, Out, Err, Prev, Tr)) :-
+    Next is Addr + Size.
 
 load_memory(Addr, state(_, Mem, _, _, _, _, _, _, _), Value) :-
     get_assoc(Addr, Mem, Value).

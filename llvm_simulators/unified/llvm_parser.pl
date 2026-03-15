@@ -14,6 +14,8 @@
     parse_llvm_file/2
 ]).
 
+:- discontiguous instruction_rhs/4.
+
 %% parse_llvm(+Source, -Module)
 %  Parse an LLVM IR source string into a module AST.
 parse_llvm(Source, Module) :-
@@ -59,6 +61,8 @@ skip_line --> ws, "source_filename", rest_of_line.
 skip_line --> ws, "target", rest_of_line.
 skip_line --> ws, "attributes", rest_of_line.
 skip_line --> ws, "!", rest_of_line.
+skip_line --> ws, "$", rest_of_line.            % comdat declarations
+skip_line --> ws, "%", identifier_str(_), ws, "=", ws, "type", rest_of_line.  % struct type defs
 
 module_item(Item) -->
     ( define_func(Item)
@@ -82,7 +86,10 @@ define_func(define(RetType, Name, Params, Blocks)) -->
     "(", param_list(Params), ")", ws,
     optional_func_attrs,
     "{", ws,
-    basic_blocks(Blocks),
+    { length(Params, NParams),
+      number_codes(NParams, ParamCodes),
+      atom_codes(ImplicitLabel, ParamCodes) },
+    basic_blocks(ImplicitLabel, Blocks),
     ws, "}", ws.
 
 % e.g., range(i32 0, 2)
@@ -92,6 +99,11 @@ optional_return_attrs --> [].
 skip_until_close_paren --> ")".
 skip_until_close_paren --> [C], { C \= 0') }, skip_until_close_paren.
 
+% skip_balanced_parens: skip content until matching close paren, handling nesting
+skip_balanced_parens --> ")".
+skip_balanced_parens --> "(", skip_balanced_parens, skip_balanced_parens.
+skip_balanced_parens --> [C], { C \= 0'(, C \= 0') }, skip_balanced_parens.
+
 declare_func(declare(RetType, Name, ParamTypes)) -->
     ws, "declare", ws1,
     optional_linkage,
@@ -100,7 +112,7 @@ declare_func(declare(RetType, Name, ParamTypes)) -->
     "(", param_type_list(ParamTypes), ")", ws,
     optional_func_attrs, ws.
 
-optional_linkage --> linkage_keyword, ws1.
+optional_linkage --> linkage_keyword, ws1, optional_linkage.
 optional_linkage --> [].
 
 linkage_keyword --> "private".
@@ -109,6 +121,7 @@ linkage_keyword --> "external".
 linkage_keyword --> "linkonce".
 linkage_keyword --> "weak".
 linkage_keyword --> "common".
+linkage_keyword --> "linkonce_odr".
 linkage_keyword --> "dso_local".
 linkage_keyword --> "appending".
 
@@ -135,6 +148,8 @@ func_attr --> "local_unnamed_addr".
 func_attr --> "unnamed_addr".
 func_attr --> "speculatable".
 func_attr --> "nocallback".
+func_attr --> "inlinehint".
+func_attr --> "comdat".
 % memory(...) attribute
 func_attr --> "memory(", skip_until_close_paren.
 
@@ -170,6 +185,12 @@ param_attr --> "sret".
 param_attr --> "noalias".
 param_attr --> "nocapture".
 param_attr --> "nonnull".
+param_attr --> "writeonly".
+param_attr --> "readonly".
+param_attr --> "immarg".
+param_attr --> "captures(", skip_balanced_parens.
+param_attr --> "initializes(", skip_balanced_parens.
+param_attr --> "dereferenceable(", skip_balanced_parens.
 param_attr --> "align", ws1, digits(_).
 
 param_type_list([Type|Rest]) -->
@@ -184,17 +205,20 @@ param_type_list([]) --> ws.
 % Basic blocks
 % ============================================================
 
-basic_blocks([Block|Rest]) -->
-    basic_block(Block),
-    ( basic_blocks(Rest)
-    ; { Rest = [] }
-    ).
+basic_blocks(ImplicitLabel, [Block|Rest]) -->
+    basic_block(ImplicitLabel, Block),
+    more_blocks(Rest).
 
-basic_block(block(Label, Instructions, Terminator)) -->
+more_blocks([Block|Rest]) -->
+    basic_block(_, Block),
+    more_blocks(Rest).
+more_blocks([]) --> [].
+
+basic_block(_, block(Label, Instructions, Terminator)) -->
     block_label(Label), ws,
     instructions(Instructions, Terminator).
 % Implicit entry block (no label before first instruction)
-basic_block(block(entry, Instructions, Terminator)) -->
+basic_block(ImplicitLabel, block(ImplicitLabel, Instructions, Terminator)) -->
     \+ block_label(_),
     instructions(Instructions, Terminator).
 
@@ -345,9 +369,13 @@ instruction_rhs(Result, select(Result, CondType, Cond, Type, TrueVal, FalseVal))
 
 instruction_rhs(Result, cast(CastOp, Result, FromType, Val, ToType)) -->
     cast_op(CastOp), ws1,
+    optional_cast_flags,
     llvm_type(FromType), ws, operand(Val), ws,
     "to", ws1,
     llvm_type(ToType).
+
+optional_cast_flags --> "nneg", ws1.
+optional_cast_flags --> [].
 
 % fneg — unary floating-point negate
 instruction_rhs(Result, fneg(Result, Type, Op)) -->
@@ -549,8 +577,11 @@ optional_call_attrs --> [].
 % GEP (getelementptr) indices
 % ============================================================
 
-gep_inbounds(inbounds) --> "inbounds", ws1.
+gep_inbounds(inbounds) --> "inbounds", ws1, optional_gep_flags.
 gep_inbounds(false) --> [].
+
+optional_gep_flags --> "nuw", ws1.
+optional_gep_flags --> [].
 
 gep_indices([index(Type, Value)|Rest]) -->
     ",", ws,
@@ -590,8 +621,7 @@ optional_load_attrs --> [].
 optional_store_attrs --> ",", ws, "align", ws1, integer_literal(_).
 optional_store_attrs --> [].
 
-optional_metadata --> ",", ws, "!dbg", ws, "!", integer_literal(_), optional_metadata.
-optional_metadata --> ",", ws, "!tbaa", ws, "!", integer_literal(_), optional_metadata.
+optional_metadata --> ",", ws, "!", identifier_str(_), ws, "!", integer_literal(_), optional_metadata.
 optional_metadata --> [].
 
 % ============================================================
@@ -617,7 +647,8 @@ optional_global_attrs --> [].
 global_init(Value) --> operand(Value).
 global_init(undef) --> "undef".
 
-optional_global_suffix --> ",", ws, "align", ws1, integer_literal(_).
+optional_global_suffix --> ",", ws, "comdat", optional_global_suffix.
+optional_global_suffix --> ",", ws, "align", ws1, integer_literal(_), optional_global_suffix.
 optional_global_suffix --> [].
 
 % ============================================================

@@ -307,13 +307,27 @@ alloc_rest(N, Type, StateIn, StateOut) :-
     alloc_rest(N1, Type, State2, StateOut).
 
 %% resolve_gep_indices(+Indices, +BaseType, +State, -ByteOffset)
-%  Compute byte offset for getelementptr. Simplified for Phase 1.
+%  Compute byte offset for getelementptr with proper type drilling.
+%  First index: offset by BaseType size (pointer arithmetic).
+%  Subsequent indices: drill into element types (array/struct member access).
 resolve_gep_indices([], _Type, _State, 0).
 resolve_gep_indices([index(IdxType, IdxOp)|Rest], BaseType, State, Offset) :-
     resolve_value(IdxOp, IdxType, State, Idx),
     type_size(BaseType, Size),
-    resolve_gep_indices(Rest, BaseType, State, RestOffset),
-    Offset is Idx * Size + RestOffset.
+    ThisOffset is Idx * Size,
+    ( Rest = [] ->
+        Offset = ThisOffset
+    ;
+        gep_element_type(BaseType, SubType),
+        resolve_gep_indices(Rest, SubType, State, RestOffset),
+        Offset is ThisOffset + RestOffset
+    ).
+
+%% gep_element_type(+Type, -ElementType)
+%  Get the element type when drilling into a composite type via GEP.
+gep_element_type(array(_, T), T).
+gep_element_type(pointer(T), T).
+gep_element_type(T, T).  % for scalar types (e.g., i8 byte-offset GEP)
 
 %% type_size(+Type, -Bytes)
 %  Size of a type in bytes (for GEP offset calculation).

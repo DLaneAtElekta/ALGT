@@ -343,5 +343,128 @@ test(angle_from_sincos_three_pi_half) :-
 
 :- end_tests(llvm_vecmat).
 
+% ============================================================
+% Phase 3: VectorBase struct tests — real clang-generated LLVM IR
+% ============================================================
+
+:- begin_tests(llvm_vectorbase).
+
+test(parse_vectorbase_ll) :-
+    parse_llvm_file('samples/vectorbase.ll', module(Globals, Declares, Defines)),
+    length(Globals, NG), NG >= 1,
+    length(Declares, ND), ND >= 5,
+    length(Defines, NF), NF >= 10.
+
+test(vec3_init_and_get_dim) :-
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, Addr, S0, S1),
+    call_function(S1, 'Vec3_init', [Addr, 1.0, 2.0, 3.0], _, S2),
+    call_function(S2, 'Vec3_getDim', [Addr], R, _),
+    R =:= 3.
+
+test(vec3_init_and_get_element) :-
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, Addr, S0, S1),
+    call_function(S1, 'Vec3_init', [Addr, 10.0, 20.0, 30.0], _, S2),
+    call_function(S2, 'Vec3_getElement', [Addr, 0], R0, _),
+    call_function(S2, 'Vec3_getElement', [Addr, 1], R1, _),
+    call_function(S2, 'Vec3_getElement', [Addr, 2], R2, _),
+    R0 =:= 10.0, R1 =:= 20.0, R2 =:= 30.0.
+
+test(vec3_getlength_345) :-
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, Addr, S0, S1),
+    call_function(S1, 'Vec3_init', [Addr, 3.0, 4.0, 0.0], _, S2),
+    call_function(S2, 'Vec3_getLength', [Addr], R, _),
+    abs(R - 5.0) < 1e-10.
+
+test(vec3_getlength_123) :-
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, Addr, S0, S1),
+    call_function(S1, 'Vec3_init', [Addr, 1.0, 2.0, 3.0], _, S2),
+    call_function(S2, 'Vec3_getLength', [Addr], R, _),
+    Expected is sqrt(14.0),
+    abs(R - Expected) < 1e-10.
+
+test(vec3_dot_orthogonal) :-
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, A1, S0, S1),
+    llvm_state:alloc_bytes(32, A2, S1, S2),
+    call_function(S2, 'Vec3_init', [A1, 1.0, 0.0, 0.0], _, S3),
+    call_function(S3, 'Vec3_init', [A2, 0.0, 1.0, 0.0], _, S4),
+    call_function(S4, 'Vec3_dot', [A1, A2], R, _),
+    abs(R) < 1e-10.
+
+test(vec3_dot_parallel) :-
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, A1, S0, S1),
+    llvm_state:alloc_bytes(32, A2, S1, S2),
+    call_function(S2, 'Vec3_init', [A1, 1.0, 2.0, 3.0], _, S3),
+    call_function(S3, 'Vec3_init', [A2, 4.0, 5.0, 6.0], _, S4),
+    call_function(S4, 'Vec3_dot', [A1, A2], R, _),
+    % 1*4 + 2*5 + 3*6 = 32
+    abs(R - 32.0) < 1e-10.
+
+test(vec3_normalize) :-
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, Addr, S0, S1),
+    call_function(S1, 'Vec3_init', [Addr, 3.0, 4.0, 0.0], _, S2),
+    call_function(S2, 'Vec3_normalize', [Addr], _, S3),
+    call_function(S3, 'Vec3_getElement', [Addr, 0], X, _),
+    call_function(S3, 'Vec3_getElement', [Addr, 1], Y, _),
+    call_function(S3, 'Vec3_getElement', [Addr, 2], Z, _),
+    abs(X - 0.6) < 1e-10,
+    abs(Y - 0.8) < 1e-10,
+    abs(Z) < 1e-10.
+
+test(vec3_add) :-
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, A1, S0, S1),
+    llvm_state:alloc_bytes(32, A2, S1, S2),
+    llvm_state:alloc_bytes(32, AR, S2, S3),
+    call_function(S3, 'Vec3_init', [A1, 1.0, 2.0, 3.0], _, S4),
+    call_function(S4, 'Vec3_init', [A2, 10.0, 20.0, 30.0], _, S5),
+    call_function(S5, 'Vec3_add', [A1, A2, AR], _, S6),
+    call_function(S6, 'Vec3_getElement', [AR, 0], X, _),
+    call_function(S6, 'Vec3_getElement', [AR, 1], Y, _),
+    call_function(S6, 'Vec3_getElement', [AR, 2], Z, _),
+    X =:= 11.0, Y =:= 22.0, Z =:= 33.0.
+
+test(vec3_scale) :-
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, Addr, S0, S1),
+    call_function(S1, 'Vec3_init', [Addr, 1.0, 2.0, 3.0], _, S2),
+    call_function(S2, 'Vec3_scale', [Addr, 2.5], _, S3),
+    call_function(S3, 'Vec3_getElement', [Addr, 0], X, _),
+    call_function(S3, 'Vec3_getElement', [Addr, 1], Y, _),
+    call_function(S3, 'Vec3_getElement', [Addr, 2], Z, _),
+    X =:= 2.5, Y =:= 5.0, Z =:= 7.5.
+
+test(vec3_cross) :-
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, A1, S0, S1),
+    llvm_state:alloc_bytes(32, A2, S1, S2),
+    llvm_state:alloc_bytes(32, AR, S2, S3),
+    call_function(S3, 'Vec3_init', [A1, 1.0, 0.0, 0.0], _, S4),
+    call_function(S4, 'Vec3_init', [A2, 0.0, 1.0, 0.0], _, S5),
+    call_function(S5, 'Vec3_cross', [A1, A2, AR], _, S6),
+    call_function(S6, 'Vec3_getElement', [AR, 0], X, _),
+    call_function(S6, 'Vec3_getElement', [AR, 1], Y, _),
+    call_function(S6, 'Vec3_getElement', [AR, 2], Z, _),
+    abs(X) < 1e-10,
+    abs(Y) < 1e-10,
+    abs(Z - 1.0) < 1e-10.
+
+test(vec3_normalize_length_one) :-
+    % After normalize, length should be 1.0
+    init_session_from_file('samples/vectorbase.ll', S0),
+    llvm_state:alloc_bytes(32, Addr, S0, S1),
+    call_function(S1, 'Vec3_init', [Addr, 1.0, 2.0, 3.0], _, S2),
+    call_function(S2, 'Vec3_normalize', [Addr], _, S3),
+    call_function(S3, 'Vec3_getLength', [Addr], Len, _),
+    abs(Len - 1.0) < 1e-10.
+
+:- end_tests(llvm_vectorbase).
+
 
 :- run_tests.
