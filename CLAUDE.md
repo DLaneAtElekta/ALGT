@@ -61,7 +61,7 @@ Strategy for verifying the Prolog interpreter produces the same behavior as comp
 
 Both sides emit `CALL ProcName(args) -> result` lines and are compared with `diff`.
 
-**Prolog side** (`simulators/clarion/unified/trace_sensorlib.pl`):
+**Prolog side** (`simulators/clarion/unified/traces/trace_sensorlib.pl`):
 - Uses `init_session`/`call_procedure` from unified `clarion.pl` module
 - Outputs `CALL ProcName(args) -> result` format lines
 
