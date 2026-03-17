@@ -1,7 +1,7 @@
 %============================================================
 % loader.lgt - Logtalk Backends Loader
 %
-% Load with: logtalk_load('clarion_simulators/unified/loader').
+% Load with: logtalk_load('simulators/clarion/unified/loader').
 %============================================================
 
 :- initialization(

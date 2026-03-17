@@ -5,7 +5,7 @@
 %   cd form-demo
 %   swipl -g "main,halt" -t "halt(1)" trace_formdemo.pl
 
-:- use_module('../../clarion_simulators/unified/clarion').
+:- use_module('../../simulators/clarion/unified/clarion').
 
 main :-
     read_file_to_string('FormDemo.clw', Src, []),

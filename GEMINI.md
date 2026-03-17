@@ -50,7 +50,7 @@ The unified simulator represents Clarion code as Prolog facts and rules:
 │   ├── form-demo/                 # GUI form + FormLib DLL for CDB tracing
 │   ├── form-cli/                  # CLI form with EventReader, .evt format
 │   └── treatment-offset/          # Treatment offset entry with sign-flip
-├── clarion_simulators/            # Prolog Clarion simulator
+├── simulators/clarion/            # Prolog Clarion simulator
 │   └── unified/                   # DCG parser + execution engine (104 tests)
 │       ├── clarion.pl             # Public API
 │       ├── clarion_parser.pl      # DCG parser
@@ -88,7 +88,7 @@ The unified simulator represents Clarion code as Prolog facts and rules:
 
 ## Architecture
 
-### Unified Clarion Simulator (`clarion_simulators/unified/`)
+### Unified Clarion Simulator (`simulators/clarion/unified/`)
 
 A single modular simulator (21 Prolog files, 104 tests) that combines parsing and execution:
 
@@ -120,7 +120,7 @@ Executes Clarion programs from their AST representation.
 ## Running Programs
 
 ```bash
-cd clarion_simulators/unified
+cd simulators/clarion/unified
 swipl
 ?- use_module(clarion).
 ?- init_session(Source, Session), call_procedure(Session, 'MyProc', Result).
@@ -130,7 +130,7 @@ swipl
 
 ```bash
 # Unified simulator tests (104 tests)
-cd clarion_simulators/unified
+cd simulators/clarion/unified
 swipl -g "main,halt" -t "halt(1)" test_unified.pl
 
 # ALGT verification tests

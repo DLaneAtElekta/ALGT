@@ -4,7 +4,7 @@
 %% compiled C++ execution.
 %%
 %% Usage:
-%%   cd llvm_simulators/unified
+%%   cd simulators/llvm/unified
 %%   swipl -g "main,halt" traces/trace_vecmat.pl
 %%
 %% Compare with C++ side:

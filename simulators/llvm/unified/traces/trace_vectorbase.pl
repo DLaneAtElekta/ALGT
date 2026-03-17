@@ -3,7 +3,7 @@
 %% Outputs CALL lines for comparison against compiled C++ execution.
 %%
 %% Usage:
-%%   cd llvm_simulators/unified
+%%   cd simulators/llvm/unified
 %%   swipl -g "main,halt" traces/trace_vectorbase.pl
 %%
 %% Compare with C++ side:
