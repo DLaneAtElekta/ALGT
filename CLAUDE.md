@@ -11,7 +11,7 @@ Combined repository: formal algorithm verification (ALGT) + Clarion language sem
 ## Technology Stack
 
 - **Clarion 11.1**: 4GL language, compiles to 32-bit Windows DLLs/EXEs
-- **SWI Prolog**: Unified Clarion simulator (clarion_simulators/unified/)
+- **SWI Prolog**: Unified Clarion simulator (simulators/clarion/unified/)
 - **Logtalk**: Object-oriented Prolog extension (ALGT domain models)
 - **Python 3.11 (32-bit)**: ctypes interop with Clarion DLLs
 - **MSBuild**: Clarion project builds (.cwproj)
@@ -32,7 +32,7 @@ Combined repository: formal algorithm verification (ALGT) + Clarion language sem
 - `form-cli/` — CLI form with EventReader, .evt file format
 - `treatment-offset/` — Treatment offset entry with direction dropdowns, sign-flip, ISqrt magnitude
 
-### Clarion Simulator (Prolog) — `clarion_simulators/`
+### Clarion Simulator (Prolog) — `simulators/clarion/`
 - `unified/` — Unified simulator combining DCG parser + modular execution engine (104 tests, storage dispatch, scenario DSL, execution tracer with ML exports)
 
 ### ALGT Verification & Domain Models
@@ -61,7 +61,7 @@ Strategy for verifying the Prolog interpreter produces the same behavior as comp
 
 Both sides emit `CALL ProcName(args) -> result` lines and are compared with `diff`.
 
-**Prolog side** (`clarion_simulators/unified/trace_sensorlib.pl`):
+**Prolog side** (`simulators/clarion/unified/trace_sensorlib.pl`):
 - Uses `init_session`/`call_procedure` from unified `clarion.pl` module
 - Outputs `CALL ProcName(args) -> result` format lines
 
@@ -72,7 +72,7 @@ Both sides emit `CALL ProcName(args) -> result` lines and are compared with `dif
 **Comparison**:
 ```bash
 diff <(cd clarion_projects/sensor-data && python trace_sensorlib.py | grep "^CALL") \
-     <(cd clarion_simulators/unified && swipl -g "main,halt" trace_sensorlib.pl | grep "^CALL.*->")
+     <(cd simulators/clarion/unified && swipl -g "main,halt" trace_sensorlib.pl | grep "^CALL.*->")
 ```
 
 ### Level 1b: CDB debugger traces (implemented)
@@ -207,14 +207,14 @@ Clarion DLL with ODBC-based sensor reading storage using SQL Server.
 
 **Key files:** `OdbcStore.clw`, `setup_db.py`, `test_odbcstore.py`
 
-### unified/ (`clarion_simulators/`)
+### unified/ (`simulators/clarion/`)
 Unified SWI-Prolog/Logtalk Clarion simulator. DCG parser + AST bridge + modular execution engine with Logtalk-based pluggable storage backends (memory/CSV/ODBC via protocol dispatch), Logtalk UI backends, scenario DSL, and execution tracer with ML exports (PGM, PyMC, Stan, GNN-VAE).
 
 **Key files:** `clarion.pl` (API), `clarion_parser.pl`, `ast_bridge.pl`, `simulator.pl`, `simulator_builtins.pl`, `simulator_eval.pl`, `simulator_control.pl`, `simulator_state.pl`, `simulator_classes.pl`, `execution_tracer.pl`, `scenario_dsl.pl`, `scenario_ahk.pl`, `storage_backend.pl` (Logtalk bridge), `ui_backend.pl` (Logtalk bridge), `storage_protocol.lgt`, `storage_memory.lgt`, `storage_csv.lgt`, `storage_odbc.lgt`, `storage_dispatcher.lgt`, `ui_protocol.lgt`, `ui_simulation.lgt`, `ui_dispatcher.lgt`, `loader.lgt`, `web_server.pl`, `test_unified.pl`
 
 **Run tests:**
 ```bash
-cd clarion_simulators/unified
+cd simulators/clarion/unified
 swipl -g "main,halt" -t "halt(1)" test_unified.pl
 ```
 

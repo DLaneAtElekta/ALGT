@@ -43,7 +43,7 @@ cd ALGT
 
 ### Clarion Simulator
 ```bash
-cd clarion_simulators/unified
+cd simulators/clarion/unified
 swipl
 ?- use_module(clarion).
 ?- init_session(Source, Session), call_procedure(Session, 'MyProc', Result).
@@ -51,7 +51,7 @@ swipl
 
 ### Run Simulator Tests
 ```bash
-cd clarion_simulators/unified
+cd simulators/clarion/unified
 swipl -g "main,halt" -t "halt(1)" test_unified.pl
 ```
 
@@ -80,7 +80,7 @@ swipl -s model_checker/model_checker.pl
 │   ├── form-demo/                 # GUI form + FormLib DLL for CDB tracing
 │   ├── form-cli/                  # CLI form with EventReader, .evt format
 │   └── treatment-offset/          # Treatment offset entry with sign-flip
-├── clarion_simulators/            # Prolog Clarion simulator
+├── simulators/clarion/            # Prolog Clarion simulator
 │   └── unified/                   # DCG parser + execution engine (104 tests)
 │       ├── clarion.pl             # Public API
 │       ├── clarion_parser.pl      # DCG parser
@@ -128,7 +128,7 @@ Test cases that formally verify geometric algorithms critical to medical imaging
 - **ALGT_ISODENSITY**: Dose distribution calculations
 - **ALGT_STRUCT_PROJ**: Geometric structure projections
 
-### Unified Clarion Simulator (`clarion_simulators/unified/`)
+### Unified Clarion Simulator (`simulators/clarion/unified/`)
 A single modular simulator (21 Prolog files, 104 tests) that combines:
 
 - **DCG Parser** — Parses Clarion `.clw` source into AST
