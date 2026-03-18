@@ -1,5 +1,6 @@
 :- module(fsharp_parser, [
-    parse_fsharp/2
+    parse_fsharp/2,
+    is_keyword/1
 ]).
 
 :- set_prolog_flag(double_quotes, codes).
@@ -85,6 +86,17 @@ ws_no_nl --> [].
 kw(S) --> S, \+ ( [C], { char_type(C, alnum) ; C == 0'_ } ).
 
 is_keyword(let).
+is_keyword(in).
+is_keyword(if).
+is_keyword(then).
+is_keyword(else).
+is_keyword(match).
+is_keyword(with).
+is_keyword(type).
+is_keyword(module).
+is_keyword(open).
+is_keyword(rec).
+is_keyword(mutable).
 
 ident(Name) -->
     [C], { char_type(C, alpha) ; C == 0'_ },

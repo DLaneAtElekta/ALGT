@@ -26,7 +26,7 @@
 :- use_module(library(filesex)).
 
 :- use_module(fsharp, [run_fsharp/2, exec_procedure/4]).
-:- use_module(fsharp_parser, [parse_fsharp/2]).
+:- use_module(fsharp_parser, [parse_fsharp/2, is_keyword/1]).
 :- use_module(fsharp_state).
 
 %------------------------------------------------------------
@@ -324,10 +324,11 @@ take_string_inner([], [], []).
 take_string_inner([0'"|Cs], [0'"], Cs) :- !.
 take_string_inner([C|Cs], [C|Ss], Rest) :- take_string_inner(Cs, Ss, Rest).
 
+%% classify_word(+Word, -Token)
+% Uses is_keyword/1 from fsharp_parser to avoid duplicating the keyword list.
 classify_word(Word, Token) :-
-    ( is_keyword(Word) -> Token = kw(Word) ; Token = plain(Word) ).
-
-is_keyword(W) :- memberchk(W, ["let", "in", "if", "then", "else", "match", "with", "type", "module", "open", "rec", "mutable"]).
+    atom_string(Atom, Word),
+    ( fsharp_parser:is_keyword(Atom) -> Token = kw(Word) ; Token = plain(Word) ).
 
 %------------------------------------------------------------
 % AST Pretty-Printer (HTML)

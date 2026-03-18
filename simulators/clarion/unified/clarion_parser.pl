@@ -5,7 +5,9 @@
 
 :- module(clarion_parser, [
     parse_clarion/2,
-    program//1
+    program//1,
+    is_keyword/1,
+    is_builtin_type/1
 ]).
 
 :- set_prolog_flag(double_quotes, codes).
