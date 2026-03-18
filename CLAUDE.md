@@ -8,6 +8,16 @@ Combined repository: formal algorithm verification (ALGT) + Clarion language sem
 * ~~Add a project with a GUI form, and then determine how best to simulate that with the interpreter (web interface?)~~ DONE — form-demo/ project + event queue simulation in interpreter
 * ~~Document strategy for determining that execution traces match between interpreter and compiled code~~ DONE — see Execution Trace Comparison section below
 
+## Development Environment Check
+
+This project uses a DSC v3 configuration (`algt-devenv.dsc.yaml`) to define the required development environment. **On every session start**, run the DSC test to verify the environment is correct:
+
+```bash
+dsc config test --file algt-devenv.dsc.yaml
+```
+
+Review the output for any resources not in desired state and inform the user of missing or misconfigured tools before proceeding with other work.
+
 ## Technology Stack
 
 - **Clarion 11.1**: 4GL language, compiles to 32-bit Windows DLLs/EXEs

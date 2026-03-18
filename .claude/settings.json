@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash check_devenv.sh",
+            "timeout": 120,
+            "statusMessage": "Checking development environment..."
+          }
+        ]
+      }
+    ]
+  }
+}
