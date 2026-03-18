@@ -1,0 +1,180 @@
+# DSC v3 configuration for ALGT project development environment
+# Run: dsc config set --file algt-devenv.dsc.yaml
+# Test: dsc config test --file algt-devenv.dsc.yaml
+
+$schema: https://aka.ms/dsc/schemas/v3/bundled/config/document.json
+metadata:
+  description: ALGT + learn-clarion-semantics development environment
+
+resources:
+  # --- Core tools (winget) ---
+
+  - name: Git
+    type: Microsoft.WinGet/Package
+    properties:
+      id: Git.Git
+      source: winget
+
+  - name: VS Code
+    type: Microsoft.WinGet/Package
+    properties:
+      id: Microsoft.VisualStudioCode
+      source: winget
+
+  - name: SWI-Prolog
+    type: Microsoft.WinGet/Package
+    properties:
+      id: SWI-Prolog.SWI-Prolog
+      source: winget
+
+  - name: Logtalk
+    type: Microsoft.WinGet/Package
+    properties:
+      id: Logtalk.Logtalk
+      source: winget
+
+  - name: DSC
+    type: Microsoft.WinGet/Package
+    properties:
+      id: Microsoft.DSC
+      source: winget
+
+  # --- Python via pyenv-win ---
+
+  - name: Install pyenv-win
+    type: Microsoft.DSC.Transitional/RunCommandOnSet
+    properties:
+      executable: powershell
+      arguments:
+        - -NoProfile
+        - -Command
+        - |
+          if (-not (Test-Path "$env:USERPROFILE\.pyenv\pyenv-win\bin\pyenv.bat")) {
+            Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1' -OutFile "$env:TEMP\install-pyenv-win.ps1"
+            & "$env:TEMP\install-pyenv-win.ps1"
+          }
+
+  - name: Python 3.11.9 (32-bit for Clarion DLL interop)
+    type: Microsoft.DSC.Transitional/RunCommandOnSet
+    dependsOn:
+      - "[resourceId('Microsoft.DSC.Transitional/RunCommandOnSet', 'Install pyenv-win')]"
+    properties:
+      executable: cmd
+      arguments:
+        - /c
+        - "%USERPROFILE%\\.pyenv\\pyenv-win\\bin\\pyenv.bat install -s 3.11.9-win32"
+
+  - name: Python 3.11.9 (64-bit)
+    type: Microsoft.DSC.Transitional/RunCommandOnSet
+    dependsOn:
+      - "[resourceId('Microsoft.DSC.Transitional/RunCommandOnSet', 'Install pyenv-win')]"
+    properties:
+      executable: cmd
+      arguments:
+        - /c
+        - "%USERPROFILE%\\.pyenv\\pyenv-win\\bin\\pyenv.bat install -s 3.11.9"
+
+  - name: Python 3.12.10
+    type: Microsoft.DSC.Transitional/RunCommandOnSet
+    dependsOn:
+      - "[resourceId('Microsoft.DSC.Transitional/RunCommandOnSet', 'Install pyenv-win')]"
+    properties:
+      executable: cmd
+      arguments:
+        - /c
+        - "%USERPROFILE%\\.pyenv\\pyenv-win\\bin\\pyenv.bat install -s 3.12.10"
+
+  # --- Node.js via fnm ---
+
+  - name: fnm (Fast Node Manager)
+    type: Microsoft.WinGet/Package
+    properties:
+      id: Schniz.fnm
+      source: winget
+
+  - name: Node.js v24 (default)
+    type: Microsoft.DSC.Transitional/RunCommandOnSet
+    dependsOn:
+      - "[resourceId('Microsoft.WinGet/Package', 'fnm (Fast Node Manager)')]"
+    properties:
+      executable: cmd
+      arguments:
+        - /c
+        - "fnm install 24 && fnm default 24"
+
+  # --- VS Code workspace settings ---
+
+  - name: VS Code workspace settings
+    type: Microsoft.DSC.Transitional/RunCommandOnSet
+    dependsOn:
+      - "[resourceId('Microsoft.WinGet/Package', 'VS Code')]"
+      - "[resourceId('Microsoft.WinGet/Package', 'Logtalk')]"
+    properties:
+      executable: powershell
+      arguments:
+        - -NoProfile
+        - -Command
+        - |
+          $settingsDir = 'd:\MUSIQ\ALGT\.vscode'
+          $settingsPath = Join-Path $settingsDir 'settings.json'
+          if (-not (Test-Path $settingsDir)) { New-Item -ItemType Directory -Path $settingsDir | Out-Null }
+          $settings = if (Test-Path $settingsPath) { Get-Content $settingsPath -Raw | ConvertFrom-Json } else { New-Object PSObject }
+          $settings | Add-Member -NotePropertyName 'logtalk.executablePath' -NotePropertyValue 'C:\Program Files (x86)\Logtalk\integration\swilgt.ps1' -Force
+          $settings | Add-Member -NotePropertyName 'terminal.integrated.defaultProfile.windows' -NotePropertyValue 'PowerShell' -Force
+          $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath
+
+  # --- PATH entries (pyenv-win) ---
+
+  - name: PATH - pyenv-win bin
+    type: Microsoft.Windows/Registry
+    properties:
+      keyPath: HKCU\Environment
+      valueName: PYENV
+      valueData:
+        String: "%USERPROFILE%\\.pyenv\\pyenv-win"
+
+  - name: PATH - pyenv-win HOME
+    type: Microsoft.Windows/Registry
+    properties:
+      keyPath: HKCU\Environment
+      valueName: PYENV_HOME
+      valueData:
+        String: "%USERPROFILE%\\.pyenv\\pyenv-win"
+
+  - name: PATH - pyenv-win ROOT
+    type: Microsoft.Windows/Registry
+    properties:
+      keyPath: HKCU\Environment
+      valueName: PYENV_ROOT
+      valueData:
+        String: "%USERPROFILE%\\.pyenv\\pyenv-win"
+
+  # --- Clarion 11.1 (manual install check) ---
+
+  - name: Clarion 11.1 installed
+    type: Microsoft.DSC/Assertion
+    properties:
+      $schema: https://aka.ms/dsc/schemas/v3/bundled/config/document.json
+      resources:
+        - name: Check Clarion directory
+          type: Microsoft.DSC.Transitional/RunCommandOnSet
+          properties:
+            executable: cmd
+            arguments:
+              - /c
+              - "if exist \"C:\\Clarion11.1\\bin\\Clarion.exe\" (exit /b 0) else (echo Clarion 11.1 not found at C:\\Clarion11.1 - manual install required & exit /b 1)"
+
+  # --- Windows SDK Debugging Tools (CDB) check ---
+
+  - name: CDB debugger installed
+    type: Microsoft.DSC/Assertion
+    properties:
+      $schema: https://aka.ms/dsc/schemas/v3/bundled/config/document.json
+      resources:
+        - name: Check CDB
+          type: Microsoft.DSC.Transitional/RunCommandOnSet
+          properties:
+            executable: cmd
+            arguments:
+              - /c
+              - "if exist \"C:\\Program Files (x86)\\Windows Kits\\10\\Debuggers\\x86\\cdb.exe\" (exit /b 0) else (echo CDB not found - install Windows SDK Debugging Tools & exit /b 1)"
