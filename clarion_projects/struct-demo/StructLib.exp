@@ -1,0 +1,6 @@
+NAME 'StructLib'
+EXPORTS
+  SLClassifyVitals
+  SLSummarizeQueue
+  SLGetVitalsSize
+  SLGetResultSize
