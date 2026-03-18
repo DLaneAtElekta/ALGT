@@ -23,25 +23,22 @@ jobs:
           sudo apt-get install -y -q swi-prolog
 
       - name: Install Logtalk
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # Get latest Logtalk release
-          LOGTALK_VERSION=$(curl -s https://api.github.com/repos/LogtalkDotOrg/logtalk3/releases/latest | grep tag_name | cut -d '"' -f 4)
+          # Get latest Logtalk release tag using gh cli (handles auth)
+          LOGTALK_VERSION=$(gh api repos/LogtalkDotOrg/logtalk3/releases/latest --jq '.tag_name')
+          if [ -z "$LOGTALK_VERSION" ]; then
+            echo "ERROR: Failed to get Logtalk version"
+            exit 1
+          fi
           echo "Installing Logtalk ${LOGTALK_VERSION}"
           curl -sL "https://github.com/LogtalkDotOrg/logtalk3/archive/refs/tags/${LOGTALK_VERSION}.tar.gz" -o logtalk.tar.gz
           tar xzf logtalk.tar.gz
           cd logtalk3-*/
           sudo cp -r . /usr/local/share/logtalk
-          # Set up Logtalk environment
-          export LOGTALKHOME=/usr/local/share/logtalk
-          export LOGTALKUSER=$HOME/logtalk
-          mkdir -p "$LOGTALKUSER"
-          cp -r "$LOGTALKHOME/adapters" "$LOGTALKUSER/"
-          cp -r "$LOGTALKHOME/core" "$LOGTALKUSER/"
-          cp -r "$LOGTALKHOME/paths" "$LOGTALKUSER/"
-          cp -r "$LOGTALKHOME/library" "$LOGTALKUSER/"
-          cp -r "$LOGTALKHOME/tools" "$LOGTALKUSER/"
           # Install SWI-Prolog integration
-          cd "$LOGTALKHOME/integration"
+          cd /usr/local/share/logtalk/integration
           if [ -f swilgt.sh ]; then
             sudo cp swilgt.sh /usr/local/bin/swilgt
             sudo chmod +x /usr/local/bin/swilgt
