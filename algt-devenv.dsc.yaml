@@ -102,6 +102,27 @@ resources:
         - /c
         - "fnm install 24 && fnm default 24"
 
+  # --- VS Code workspace settings ---
+
+  - name: VS Code workspace settings
+    type: Microsoft.DSC.Transitional/RunCommandOnSet
+    dependsOn:
+      - "[resourceId('Microsoft.WinGet/Package', 'VS Code')]"
+      - "[resourceId('Microsoft.WinGet/Package', 'Logtalk')]"
+    properties:
+      executable: powershell
+      arguments:
+        - -NoProfile
+        - -Command
+        - |
+          $settingsDir = 'd:\MUSIQ\ALGT\.vscode'
+          $settingsPath = Join-Path $settingsDir 'settings.json'
+          if (-not (Test-Path $settingsDir)) { New-Item -ItemType Directory -Path $settingsDir | Out-Null }
+          $settings = if (Test-Path $settingsPath) { Get-Content $settingsPath -Raw | ConvertFrom-Json } else { New-Object PSObject }
+          $settings | Add-Member -NotePropertyName 'logtalk.executablePath' -NotePropertyValue 'C:\Program Files (x86)\Logtalk\integration\swilgt.ps1' -Force
+          $settings | Add-Member -NotePropertyName 'terminal.integrated.defaultProfile.windows' -NotePropertyValue 'PowerShell' -Force
+          $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath
+
   # --- PATH entries (pyenv-win) ---
 
   - name: PATH - pyenv-win bin

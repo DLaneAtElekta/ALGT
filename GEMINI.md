@@ -8,10 +8,10 @@ This project uses Prolog to parse, analyze, and execute Clarion programs. Clario
 
 ## Development Environment Check
 
-This project uses a DSC v3 configuration (`algt-devenv.dsc.yaml`) to define the required development environment. **On every session start**, run the DSC test to verify the environment is correct:
+This project uses a DSC v3 configuration (`algt-devenv.dsc.yaml`) to define the required development environment. **On every session start**, run the check script to verify the environment is correct:
 
 ```bash
-dsc config test --file algt-devenv.dsc.yaml
+bash check_devenv.sh
 ```
 
 Review the output for any resources not in desired state and inform the user of missing or misconfigured tools before proceeding with other work.

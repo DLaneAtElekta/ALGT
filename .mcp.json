@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "clarion-dll": {
+      "type": "stdio",
+      "command": "C:\\Users\\Derek\\.pyenv\\pyenv-win\\versions\\3.11.9-win32\\python.exe",
+      "args": ["D:\\MUSIQ\\ALGT\\mcp_servers\\python_dll\\server.py"],
+      "env": {}
+    }
+  }
+}

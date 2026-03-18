@@ -10,6 +10,8 @@ if command -v dsc &>/dev/null; then
     DSC_CMD=dsc
 elif [ -x "/c/Program Files/dsc/dsc.exe" ]; then
     DSC_CMD="/c/Program Files/dsc/dsc.exe"
+elif [ -x "/mnt/c/Program Files/dsc/dsc.exe" ]; then
+    DSC_CMD="/mnt/c/Program Files/dsc/dsc.exe"
 else
     echo '{"systemMessage":"Dev env check: dsc not found on PATH"}'
     exit 0
