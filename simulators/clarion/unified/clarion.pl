@@ -25,7 +25,9 @@
     exec_procedure/4,          % exec_procedure(+Source, +ProcName, +Args, -Result)
     exec_program/3,            % exec_program(+Source, +Events, -Result)
     init_session/2,            % init_session(+Source, -Session)
-    call_procedure/5           % call_procedure(+Session, +ProcName, +Args, -Result, -Session2)
+    call_procedure/5,          % call_procedure(+Session, +ProcName, +Args, -Result, -Session2)
+    ast_to_mermaid/2,          % ast_to_mermaid(+SimpleAST, -MermaidString)
+    ast_to_mermaid_file/2      % ast_to_mermaid_file(+SimpleAST, +FileName)
 ]).
 
 :- use_module(clarion_parser, [parse_clarion/2]).
@@ -34,6 +36,7 @@
 :- use_module(simulator_state).
 :- use_module(simulator_eval).
 :- use_module(simulator_builtins).
+:- use_module(ast_mermaid, [ast_to_mermaid/2, ast_to_mermaid_file/2]).
 
 %------------------------------------------------------------
 % Parse + Bridge
