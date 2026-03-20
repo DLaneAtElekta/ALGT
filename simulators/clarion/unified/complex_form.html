@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Patient Data Entry</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f0f0; padding: 20px; }
+  .window {     position: relative;     border: 1px solid #999;     background-color: #e0e0e0;     box-shadow: 4px 4px 10px rgba(0,0,0,0.3);     margin: 0 auto;     overflow: hidden;   }
+  .window-title {     background-color: #0078d7;     color: white;     padding: 5px 10px;     font-weight: bold;     font-size: 14px;     height: 25px;     box-sizing: border-box;   }
+  .window-content { position: relative; width: 100%; height: calc(100% - 25px); }
+  .control { position: absolute; font-size: 12px; box-sizing: border-box; }
+  .prompt { text-align: left; vertical-align: middle; line-height: 1.2; }
+  .entry { border: 1px solid #ccc; padding: 2px; background: white; }
+  .button { background-color: #eee; border: 1px solid #777; cursor: pointer; text-align: center; }
+  .button:hover { background-color: #ddd; }
+  .string { color: #333; }
+  .list { border: 1px solid #ccc; background: white; }
+  .check-container { display: flex; align-items: center; }
+  .check-label { margin-left: 5px; white-space: nowrap; }
+  .group { border: 1px solid #aaa; border-radius: 3px; }
+  .group-title { position: absolute; top: -10px; left: 10px; background: #e0e0e0; padding: 0 5px; font-size: 11px; color: #555; }
+</style>
+</head>
+<body>
+<div class="window" style="width: 600px; height: 440px;">
+  <div class="window-title">Patient Data Entry</div>
+  <div class="window-content">
+<label class="control prompt" style="left:20px; top:20px;">Patient ID:</label>
+<input class="control entry" type="text" style="left:160px; top:20px; width:120px; height:24px;">
+<label class="control prompt" style="left:20px; top:50px;">Full Name:</label>
+<input class="control entry" type="text" style="left:160px; top:50px; width:300px; height:24px;">
+<label class="control prompt" style="left:20px; top:80px;">Gender:</label>
+<select class="control list" style="left:160px; top:80px; width:120px; height:24px;">
+  <option>Male</option>
+  <option>Female</option>
+  <option>Other</option>
+</select>
+<div class="control check-container" style="left:20px; top:110px;">
+  <input type="checkbox">
+  <label class="check-label">Active Case</label>
+</div>
+<div class="control group" style="left:20px; top:150px; width:560px; height:200px;">
+  <div class="group-title">Notes</div>
+</div>
+<input class="control entry" type="text" style="left:30px; top:170px; width:540px; height:170px;">
+<button class="control button" style="left:340px; top:370px; width:100px; height:32px;">Save</button>
+<button class="control button" style="left:460px; top:370px; width:100px; height:32px;">Close</button>
+  </div>
+</div>
+</body>
+</html>
