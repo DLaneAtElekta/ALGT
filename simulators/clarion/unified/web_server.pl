@@ -27,6 +27,7 @@
 
 :- use_module(clarion, [parse_clarion/2, bridge/2, exec_procedure/4]).
 :- use_module(ast_bridge, [bridge_ast/2]).
+:- use_module(clarion_parser, [is_keyword/1, is_builtin_type/1]).
 
 %------------------------------------------------------------
 % HTTP Routes
@@ -451,37 +452,16 @@ take_string_inner([], [], []).
 take_string_inner([0''|Cs], [0''], Cs) :- !.
 take_string_inner([C|Cs], [C|Ss], Rest) :- take_string_inner(Cs, Ss, Rest).
 
+%% classify_word(+Word, -Token)
+% Uses is_keyword/1 and is_builtin_type/1 from clarion_parser to avoid
+% duplicating the keyword lists.
 classify_word(Word, Token) :-
-    upcase_atom(Word, Upper),
+    string_upper(Word, UpperStr),
     atom_string(Upper, UpperStr),
-    ( is_keyword(UpperStr) -> Token = kw(Word)
-    ; is_type_keyword(UpperStr) -> Token = type_kw(Word)
+    ( clarion_parser:is_builtin_type(Upper) -> Token = type_kw(Word)
+    ; clarion_parser:is_keyword(Upper) -> Token = kw(Word)
     ; Token = plain(Word)
     ).
-
-upcase_atom(Word, Upper) :-
-    string_upper(Word, UpperStr),
-    atom_string(Upper, UpperStr).
-
-is_keyword(W) :- memberchk(W, [
-    "MEMBER", "PROGRAM", "MAP", "MODULE", "END", "PROCEDURE", "CODE",
-    "IF", "THEN", "ELSIF", "ELSE", "CASE", "OF", "OROF",
-    "LOOP", "TO", "BY", "WHILE", "UNTIL", "BREAK", "CYCLE", "EXIT",
-    "RETURN", "DO", "ROUTINE",
-    "FILE", "RECORD", "GROUP", "QUEUE", "CLASS", "EXPORT", "PRIVATE",
-    "OPEN", "CLOSE", "ADD", "PUT", "GET", "DELETE", "NEXT", "PREVIOUS",
-    "SET", "FREE", "SORT", "RECORDS", "CREATE",
-    "ACCEPT", "WINDOW", "BUTTON", "ENTRY", "STRING", "LIST", "DROP",
-    "DISPLAY", "SELECT", "USE", "SELF", "PARENT", "VIRTUAL",
-    "BEGIN", "SECTION", "INCLUDE", "NAME", "LIKE", "PRE", "DIM",
-    "NOT", "AND", "OR", "TRUE", "FALSE", "RAW", "PASCAL"
-]).
-
-is_type_keyword(W) :- memberchk(W, [
-    "LONG", "SHORT", "BYTE", "REAL", "SREAL", "DECIMAL", "PDECIMAL",
-    "STRING", "CSTRING", "PSTRING", "DATE", "TIME",
-    "SIGNED", "UNSIGNED", "BINARY", "BOOL"
-]).
 
 %------------------------------------------------------------
 % AST Pretty-Printer (HTML)

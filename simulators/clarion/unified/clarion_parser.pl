@@ -5,7 +5,9 @@
 
 :- module(clarion_parser, [
     parse_clarion/2,
-    program//1
+    program//1,
+    is_keyword/1,
+    is_builtin_type/1
 ]).
 
 :- set_prolog_flag(double_quotes, codes).
@@ -323,6 +325,11 @@ window_attr(at(X, Y, W, H)) -->
     kw("AT"), ws, "(", ws, opt_number(X), ws, ",", ws, opt_number(Y), ws,
     ",", ws, number(W), ws, ",", ws, number(H), ws, ")".
 window_attr(center) --> kw("CENTER").
+window_attr(gray) --> kw("GRAY").
+window_attr(system) --> kw("SYSTEM").
+window_attr(font(Name, Size)) --> kw("FONT"), ws, "(", ws, "'", qchars(Cs), "'", ws, ",", ws, number(Size), ws, ")",
+    { atom_codes(Name, Cs) }.
+window_attr(attr(Name)) --> word(Name).
 
 opt_number(N) --> number(N), !.
 opt_number(0) --> [].
@@ -351,6 +358,24 @@ control_decl(string_ctl(Text, Attrs, UseVar)) -->
     kw("STRING"), ws, "(", ws, "'", qchars(TCs), "'", ws, ")", ws,
     control_attrs_with_use(Attrs, UseVar),
     { atom_codes(Text, TCs) }.
+
+control_decl(check(Text, Attrs, UseVar)) -->
+    kw("CHECK"), ws, "(", ws, "'", qchars(TCs), "'", ws, ")", ws,
+    control_attrs_with_use(Attrs, UseVar),
+    { atom_codes(Text, TCs) }.
+
+control_decl(group_ctl(Text, Attrs, Controls)) -->
+    kw("GROUP"), ws, "(", ws, "'", qchars(TCs), "'", ws, ")", ws,
+    comma_attrs(control_attr, Attrs), ws,
+    star(control_decl, Controls), ws,
+    kw("END"),
+    { atom_codes(Text, TCs) }.
+
+control_decl(group_ctl('', Attrs, Controls)) -->
+    kw("GROUP"), ws,
+    comma_attrs(control_attr, Attrs), ws,
+    star(control_decl, Controls), ws,
+    kw("END").
 
 % LIST drop-down: LIST,AT(...),USE(?name),DROP(n),FROM('items')
 control_decl(list_ctl(Attrs, UseRef, Drop, Items)) -->
@@ -1013,7 +1038,7 @@ is_keyword(Name) :-
                'TO','CASE','OF','DIM','AND','OR',
                'DELETE','KEY','PRIMARY','OWNER',
                'ACCEPT','DISPLAY','ACCEPTED',
-               'PROMPT','ENTRY','BUTTON','STRING','LIST','AT','USE',
+               'PROMPT','ENTRY','BUTTON','STRING','LIST','AT','USE','CHECK',
                'CENTER','DROP','FROM','CHOICE','SELECT',
                'WHILE','UNTIL','ELSIF','CYCLE','DO','ROUTINE','EXIT',
                'SHORT','REAL','SREAL','BYTE','DATE','TIME',

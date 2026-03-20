@@ -51,7 +51,7 @@ swipl -g "main,halt" -t "halt(1)" test_unified.pl
 |--------|------|
 | `execution_tracer.pl` | Execution trace capture, DAG construction, ML exports (PyTorch Geometric, PGM, PyMC, Stan, GNN-VAE) |
 | `templates/` | External Python templates loaded by `execution_tracer.pl` (`analyze_paths.py`, `gnn_vae.py`) |
-| `trace_sensorlib.pl` | SensorLib trace script for comparison against compiled DLL |
+| `traces/trace_sensorlib.pl` | SensorLib trace script for comparison against compiled DLL |
 | `compare_cdb_unified.py` | Three-way trace comparison: CDB debugger vs unified simulator vs original simulator |
 
 ### Scenario DSL
