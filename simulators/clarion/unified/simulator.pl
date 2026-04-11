@@ -616,7 +616,9 @@ exec_accept_loop(Body, StateIn, StateOut, Control, _Phase) :-
 %------------------------------------------------------------
 
 exec_call(Name, Args, StateIn, StateOut, Result) :-
-    ( builtin_call(Name, Args, StateIn, StateOut, Result)
+    % Clarion is case-insensitive; builtins are registered UPPERCASE
+    upcase_atom(Name, UName),
+    ( builtin_call(UName, Args, StateIn, StateOut, Result)
     -> true
     ; is_external_proc(Name, StateIn)
     -> % External MODULE procedure — execute as stub

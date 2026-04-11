@@ -66,6 +66,7 @@ body {
 
 /* Form Panels — Clarion/Windows 3.1 style */
 .forms-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.form-column { display: flex; flex-direction: column; }
 
 .form-panel {
   background: #c0c0c0;
@@ -151,22 +152,29 @@ body {
   padding-top: 4px;
 }
 
-/* DCG diagram inside Clarion form */
-.form-panel .dcg-diagram {
-  margin: 4px 0;
+/* DCG State Diagram — below the Clarion window */
+.dcg-diagram {
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px; margin: 4px 0 0 0; padding: 4px 0;
+  font-family: var(--font-mono); font-size: 11px;
 }
-.form-panel .dcg-node {
-  background: #c0c0c0; border: 1px solid #808080;
-  color: #000; font-size: 10px; padding: 1px 5px;
+.dcg-node {
+  padding: 2px 8px; border: 1px solid var(--border);
+  border-radius: 4px; color: var(--text-dim); background: var(--surface);
 }
-.form-panel .dcg-node.active {
-  background: #000080; color: #fff; border-color: #000080;
-  font-weight: 700;
+.dcg-node.active {
+  border-color: var(--accent); color: var(--accent);
+  background: rgba(88, 166, 255, 0.1); font-weight: 700;
 }
-.form-panel.doubler .dcg-node.active {
-  background: #006000; border-color: #006000;
+.dcg-diagram.incrementer .dcg-node.active {
+  border-color: var(--spid-a); color: var(--spid-a);
+  background: var(--spid-a-bg);
 }
-.form-panel .dcg-arrow { color: #808080; font-size: 9px; }
+.dcg-diagram.doubler .dcg-node.active {
+  border-color: var(--spid-b); color: var(--spid-b);
+  background: var(--spid-b-bg);
+}
+.dcg-arrow { color: var(--text-dim); font-size: 10px; }
 
 /* Tape */
 .tape-section { margin-bottom: 16px; }
@@ -175,51 +183,15 @@ body {
   text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
 }
 
-.tape {
-  display: flex; gap: 3px; overflow-x: auto;
-  padding: 12px 8px; background: var(--surface);
-  border: 1px solid var(--border); border-radius: 8px;
-  min-height: 80px; align-items: flex-start;
+/* Head indicators (inline in tape label) */
+.tape-heads-inline {
+  display: inline-flex; gap: 12px; margin-left: 12px;
 }
-
-.tape-cell {
-  min-width: 90px; max-width: 110px; padding: 8px;
-  border: 2px solid var(--border); border-radius: 6px;
+.head-indicator {
   font-family: var(--font-mono); font-size: 11px;
-  flex-shrink: 0; position: relative; cursor: pointer;
-  transition: all 0.15s;
 }
-.tape-cell:hover { transform: translateY(-2px); }
-
-.tape-cell .tx-id {
-  font-weight: 700; font-size: 10px; color: var(--text-dim);
-  margin-bottom: 4px;
-}
-.tape-cell .op-type { font-weight: 600; margin-bottom: 2px; color: #ff7b72; }
-.tape-cell .tape-tbl { font-size: 10px; color: #c084fc; margin-bottom: 2px; }
-.tape-cell .summary { font-size: 10px; color: var(--text-dim); word-break: break-all; }
-
-.tape-cell.spid_a { border-color: var(--spid-a); background: var(--spid-a-bg); }
-.tape-cell.spid_b { border-color: var(--spid-b); background: var(--spid-b-bg); }
-.tape-cell.seed { border-color: var(--seed); background: var(--seed-bg); }
-
-.tape-cell.compensation {
-  text-decoration: line-through; opacity: 0.5;
-  border-style: dashed;
-}
-
-/* Head indicators */
-.tape-heads {
-  display: flex; gap: 3px; padding: 0 8px;
-  margin-top: 4px;
-}
-.tape-head-slot {
-  min-width: 90px; max-width: 110px; flex-shrink: 0;
-  text-align: center; font-size: 11px; font-family: var(--font-mono);
-  height: 20px;
-}
-.tape-head-slot.head-a { color: var(--spid-a); }
-.tape-head-slot.head-b { color: var(--spid-b); }
+.head-indicator.head-a { color: var(--spid-a); }
+.head-indicator.head-b { color: var(--spid-b); }
 
 /* Table */
 .table-section { margin-bottom: 16px; }
@@ -240,20 +212,72 @@ body {
   border-bottom: 1px solid var(--border); font-size: 14px;
 }
 
-/* LLM Panel */
-.llm-panel {
+/* Chat Panel */
+.chat-panel {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 8px; padding: 14px; margin-top: 12px;
-  display: flex; gap: 12px; align-items: flex-start;
+  border-radius: 8px; margin-top: 12px; overflow: hidden;
+  display: flex; flex-direction: column;
 }
-.llm-avatar {
-  width: 48px; height: 48px; border-radius: 6px;
-  flex-shrink: 0; object-fit: cover;
+.chat-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-bottom: 1px solid var(--border);
+  font-weight: 600; font-size: 13px;
 }
-.llm-text {
-  font-size: 13px; color: var(--text-dim); line-height: 1.6;
-  font-style: italic; flex: 1;
+.chat-header-avatar { width: 24px; height: 24px; border-radius: 4px; object-fit: cover; }
+.chat-model { margin-left: auto; font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); }
+
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 10px 12px;
+  max-height: 280px; min-height: 80px;
+  display: flex; flex-direction: column; gap: 8px;
 }
+
+.chat-msg {
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.chat-msg.user { flex-direction: row-reverse; }
+
+.chat-avatar-img {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid var(--border); object-fit: cover;
+}
+.user-avatar {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--border); color: var(--text-dim); font-size: 9px;
+  width: 28px; height: 28px; border-radius: 4px;
+}
+
+.chat-bubble {
+  font-size: 13px; line-height: 1.5; padding: 6px 10px;
+  border-radius: 6px; max-width: 80%; white-space: pre-wrap;
+}
+.chat-msg.assistant .chat-bubble {
+  background: var(--bg); color: var(--text);
+}
+.chat-msg.user .chat-bubble {
+  background: #1c3a5f; color: var(--accent);
+}
+
+.chat-input-row {
+  display: flex; gap: 6px; padding: 8px 12px;
+  border-top: 1px solid var(--border);
+}
+.chat-input {
+  flex: 1; padding: 6px 10px; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--bg); color: var(--text);
+  font-size: 13px; font-family: var(--font-sans);
+  outline: none;
+}
+.chat-input:focus { border-color: var(--accent); }
+.chat-input:disabled { opacity: 0.5; }
+
+.chat-send {
+  padding: 6px 14px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--accent); font-size: 13px;
+  cursor: pointer; font-family: var(--font-sans);
+}
+.chat-send:hover { border-color: var(--accent); }
+.chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Tape Minimap — 1-2px per character, syntax colored */
 .tape-minimap {
@@ -280,8 +304,3 @@ body {
 }
 .dcg-arrow { color: var(--text-dim); font-size: 10px; }
 
-/* Empty state */
-.tape-empty {
-  color: var(--text-dim); font-style: italic;
-  padding: 20px; text-align: center; width: 100%;
-}

@@ -1,11 +1,9 @@
-"""compare_cdb_prolog.py — Compare CDB debugger trace with Prolog interpreter trace.
+"""compare_cdb_prolog.py — Compare CDB debugger trace with Prolog interpreter trace
+for FuelLib (fuel inventory management).
 
 Runs both:
-1. CDB attached to Python loading SensorLib.dll (compiled Clarion)
-2. SWI-Prolog interpreter executing SensorLib.clw source
-
-Extracts procedure ENTER/EXIT events with arguments and return values,
-then compares them line by line.
+1. CDB attached to Python loading FuelLib.dll (compiled Clarion)
+2. SWI-Prolog interpreter executing FuelLib.clw source
 
 Usage: python compare_cdb_prolog.py
 """
@@ -17,15 +15,16 @@ import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CDB = r"C:\Program Files (x86)\Windows Kits\10\Debuggers\x86\cdb.exe"
 PYTHON32 = os.path.expanduser(r"~\.pyenv\pyenv-win\versions\3.11.9-win32\python.exe")
-PROLOG_DIR = os.path.join(SCRIPT_DIR, "..", "..", "simulators/clarion", "unified")
+PROLOG_DIR = os.path.join(SCRIPT_DIR, "..", "..", "simulators", "clarion", "unified")
 
 
 def run_cdb_trace():
     """Run CDB and extract procedure-level trace."""
     # Clean up previous data
-    dat = os.path.join(SCRIPT_DIR, "Sensors.dat")
-    if os.path.exists(dat):
-        os.remove(dat)
+    for f in ["FuelPrice.dat", "FuelTrans.dat"]:
+        p = os.path.join(SCRIPT_DIR, f)
+        if os.path.exists(p):
+            os.remove(p)
 
     target = os.path.join(SCRIPT_DIR, "cdb_trace_target.py")
     bp_script = os.path.join(SCRIPT_DIR, "cdb_breakpoints.txt")
@@ -36,7 +35,6 @@ def run_cdb_trace():
     )
     output = result.stdout
 
-    # Parse TRACE_ENTER / TRACE_EXIT pairs with args and return values
     lines = output.split("\n")
     trace = []
     i = 0
@@ -46,23 +44,22 @@ def run_cdb_trace():
             proc = line[len("TRACE_ENTER "):]
             args = []
             i += 1
-            # Collect arg lines until we hit TRACE_EXIT
             while i < len(lines):
                 l = lines[i].strip()
                 if l.startswith("arg"):
-                    # Next line has the hex value
                     i += 1
                     if i < len(lines):
                         val_match = re.search(r'([0-9a-f]{8})$', lines[i].strip())
                         if val_match:
-                            args.append(int(val_match.group(1), 16))
+                            val = int(val_match.group(1), 16)
+                            if val >= 0x80000000:
+                                val -= 0x100000000
+                            args.append(val)
                 elif "TRACE_EXIT" in l:
-                    # Find eax value
                     while i < len(lines):
                         eax_match = re.match(r'eax=([0-9a-f]+)', lines[i].strip())
                         if eax_match:
                             ret = int(eax_match.group(1), 16)
-                            # Handle signed 32-bit return values
                             if ret >= 0x80000000:
                                 ret -= 0x100000000
                             arg_str = ", ".join(str(a) for a in args)
@@ -78,12 +75,13 @@ def run_cdb_trace():
 def run_prolog_trace():
     """Run Prolog interpreter and extract procedure-level trace."""
     # Clean up previous data
-    dat = os.path.join(SCRIPT_DIR, "Sensors.dat")
-    if os.path.exists(dat):
-        os.remove(dat)
+    for f in ["FuelPrice.dat", "FuelTrans.dat"]:
+        p = os.path.join(SCRIPT_DIR, f)
+        if os.path.exists(p):
+            os.remove(p)
 
     result = subprocess.run(
-        ["swipl", "-g", "main,halt", "-t", "halt(1)", "traces/trace_sensorlib.pl"],
+        ["swipl", "-g", "main,halt", "-t", "halt(1)", "traces/trace_fuel.pl"],
         capture_output=True, text=True, timeout=30,
         cwd=PROLOG_DIR
     )
@@ -92,12 +90,14 @@ def run_prolog_trace():
         line = line.strip()
         if line.startswith("CALL ") and " -> " in line:
             trace.append(line)
+    if result.returncode != 0 and not trace:
+        print(f"Prolog stderr: {result.stderr}", file=sys.stderr)
     return trace
 
 
 def main():
     print("=" * 60)
-    print("CDB Debugger vs Prolog Interpreter Trace Comparison")
+    print("FuelLib: CDB vs Prolog Trace Comparison")
     print("=" * 60)
 
     print("\n--- Running CDB trace (compiled DLL) ---")
