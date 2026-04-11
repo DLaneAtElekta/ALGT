@@ -18,7 +18,7 @@
 :- use_module(clarion).
 
 main :-
-    read_file_to_string('../../clarion_projects/mandelbrot/FractalLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/mandelbrot/FractalLib.clw', Src, []),
     init_session(Src, S0),
 
     % --- Mandelbrot single-point tests ---

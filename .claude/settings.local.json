@@ -88,7 +88,8 @@
       "Bash(\"/c/Program Files/dsc/dsc.exe\" resource list)",
       "Bash(grep -E '\\\\.pl$|run')",
       "Bash(git branch:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash([ ! -f \"/d/MUSIQ/ALGT/clarion_projects/$d/bin/ClaRUN.dll\" ])"
     ]
   },
   "enableAllProjectMcpServers": true,

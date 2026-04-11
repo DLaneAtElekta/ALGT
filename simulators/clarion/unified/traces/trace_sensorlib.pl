@@ -9,7 +9,7 @@
 :- use_module(clarion).
 
 main :-
-    read_file_to_string('../../clarion_projects/sensor-data/SensorLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/sensor-data/SensorLib.clw', Src, []),
     init_session(Src, S0),
 
     call_procedure(S0, 'SSOpen', [], R0, S1),

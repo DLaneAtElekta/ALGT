@@ -9,7 +9,7 @@
 :- use_module(clarion).
 
 main :-
-    read_file_to_string('../../clarion_projects/radar-term/RadarLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/radar-term/RadarLib.clw', Src, []),
     init_session(Src, S0),
 
     % Open files

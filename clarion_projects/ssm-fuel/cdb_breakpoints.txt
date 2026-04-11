@@ -1,0 +1,15 @@
+* CDB breakpoint script for FuelLib.dll tracing
+* Wait for FuelLib.dll to load, then set breakpoints
+sxe ld:FuelLib
+g
+.echo *** CDB: FuelLib.dll loaded, setting breakpoints ***
+bu FuelLib!FLOpen ".echo TRACE_ENTER FLOpen; gu; .echo TRACE_EXIT FLOpen eax=; r eax; gc"
+bu FuelLib!FLClose ".echo TRACE_ENTER FLClose; gu; .echo TRACE_EXIT FLClose eax=; r eax; gc"
+bu FuelLib!FLSetPrice ".echo TRACE_ENTER FLSetPrice; .echo   arg1(fuelType)=; dd esp+4 L1; .echo   arg2(price)=; dd esp+8 L1; gu; .echo TRACE_EXIT FLSetPrice eax=; r eax; gc"
+bu FuelLib!FLGetPrice ".echo TRACE_ENTER FLGetPrice; .echo   arg1(fuelType)=; dd esp+4 L1; gu; .echo TRACE_EXIT FLGetPrice eax=; r eax; gc"
+bu FuelLib!FLAddTransaction ".echo TRACE_ENTER FLAddTransaction; .echo   arg1(month)=; dd esp+4 L1; .echo   arg2(day)=; dd esp+8 L1; .echo   arg3(year)=; dd esp+c L1; .echo   arg4(hour)=; dd esp+10 L1; .echo   arg5(minute)=; dd esp+14 L1; .echo   arg6(descPtr)=; dd esp+18 L1; .echo   arg7(descLen)=; dd esp+1c L1; .echo   arg8(amount)=; dd esp+20 L1; gu; .echo TRACE_EXIT FLAddTransaction eax=; r eax; gc"
+bu FuelLib!FLGetTransactionCount ".echo TRACE_ENTER FLGetTransactionCount; gu; .echo TRACE_EXIT FLGetTransactionCount eax=; r eax; gc"
+bu FuelLib!FLGetBalance ".echo TRACE_ENTER FLGetBalance; gu; .echo TRACE_EXIT FLGetBalance eax=; r eax; gc"
+bu FuelLib!FLRecalcBalances ".echo TRACE_ENTER FLRecalcBalances; gu; .echo TRACE_EXIT FLRecalcBalances eax=; r eax; gc"
+.echo *** CDB: Breakpoints set, continuing ***
+g

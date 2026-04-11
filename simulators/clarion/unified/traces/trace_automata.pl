@@ -13,7 +13,7 @@
 :- use_module(clarion).
 
 main :-
-    read_file_to_string('../../clarion_projects/automata/AutomataLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/automata/AutomataLib.clw', Src, []),
     init_session(Src, S0),
 
     % Initialize the automaton

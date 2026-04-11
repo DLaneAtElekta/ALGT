@@ -45,7 +45,7 @@ test_parse_simple :-
     check('Procedure count', NProc, 1).
 
 test_parse_mathlib :-
-    read_file_to_string('../../clarion_projects/python-dll/MathLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/python-dll/MathLib.clw', Src, []),
     parse_clarion(Src, SimpleAST),
     bridge_ast(SimpleAST, ModAST),
     ModAST = program(_, _, _, Procs),
@@ -53,7 +53,7 @@ test_parse_mathlib :-
     check('MathLib.clw parse + bridge', N, 2).
 
 test_parse_sensorlib :-
-    read_file_to_string('../../clarion_projects/sensor-data/SensorLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/sensor-data/SensorLib.clw', Src, []),
     parse_clarion(Src, SimpleAST),
     bridge_ast(SimpleAST, ModAST),
     ModAST = program(_, GlobalDecls, _, Procs),
@@ -64,7 +64,7 @@ test_parse_sensorlib :-
     check('SensorLib.clw file declarations', NF, 1).
 
 test_parse_diagstore :-
-    read_file_to_string('../../clarion_projects/diagnosis-store/DiagnosisStore.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/diagnosis-store/DiagnosisStore.clw', Src, []),
     parse_clarion(Src, SimpleAST),
     bridge_ast(SimpleAST, ModAST),
     ModAST = program(_, _, _, Procs),
@@ -73,7 +73,7 @@ test_parse_diagstore :-
     check('DiagnosisStore.clw parse + bridge', R, true).
 
 test_parse_formdemo :-
-    read_file_to_string('../../clarion_projects/form-demo/FormDemo.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/form-demo/FormDemo.clw', Src, []),
     parse_clarion(Src, SimpleAST),
     bridge_ast(SimpleAST, ModAST),
     ModAST = program(_, GlobalDecls, code(Main), _),
@@ -85,7 +85,7 @@ test_parse_formdemo :-
     check('FormDemo.clw window declarations', NW, 1).
 
 test_parse_odbcstore :-
-    read_file_to_string('../../clarion_projects/odbc-store/OdbcStore.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/odbc-store/OdbcStore.clw', Src, []),
     parse_clarion(Src, SimpleAST),
     bridge_ast(SimpleAST, ModAST),
     ModAST = program(_, _, _, Procs),
@@ -94,7 +94,7 @@ test_parse_odbcstore :-
     check('OdbcStore.clw parse + bridge', RN, true).
 
 test_parse_controlflow :-
-    read_file_to_string('../../clarion_projects/clarion_examples/control_flow.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/clarion_examples/control_flow.clw', Src, []),
     parse_clarion(Src, SimpleAST),
     bridge_ast(SimpleAST, ModAST),
     ModAST = program(_, _, _, ModProcs),
@@ -175,7 +175,7 @@ test_parse_cstring_params :-
     ).
 
 test_parse_statslib :-
-    read_file_to_string('../../clarion_projects/stats-calc/StatsLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/stats-calc/StatsLib.clw', Src, []),
     parse_clarion(Src, _AST),
     check('StatsLib.clw parse', ok, ok).
 
@@ -185,7 +185,7 @@ test_parse_statslib :-
 
 test_mathadd :-
     format("~nArithmetic tests:~n"),
-    read_file_to_string('../../clarion_projects/python-dll/MathLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/python-dll/MathLib.clw', Src, []),
     exec_procedure(Src, 'MathAdd', [3, 4], R1),
     check('MathAdd(3, 4)', R1, 7),
     exec_procedure(Src, 'MathAdd', [-10, 10], R2),
@@ -278,7 +278,7 @@ test_size_group :-
 
 test_sensorlib :-
     format("~nFile I/O tests (SensorLib):~n"),
-    read_file_to_string('../../clarion_projects/sensor-data/SensorLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/sensor-data/SensorLib.clw', Src, []),
     init_session(Src, S0),
     call_procedure(S0, 'SSOpen', [], R0, S1),
     check('SSOpen()', R0, 0),
@@ -303,7 +303,7 @@ test_sensorlib :-
 
 test_diagstore :-
     format("~nFile I/O tests (DiagnosisStore):~n"),
-    read_file_to_string('../../clarion_projects/diagnosis-store/DiagnosisStore.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/diagnosis-store/DiagnosisStore.clw', Src, []),
     init_session(Src, S0),
     % Open store first
     call_procedure(S0, 'DSOpenStore', [], R0, S1),
@@ -402,7 +402,7 @@ test_form_no_events :-
     check('Form no events: Result=0', R1, 0).
 
 test_formdemo_exec :-
-    read_file_to_string('../../clarion_projects/form-demo/FormDemo.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/form-demo/FormDemo.clw', Src, []),
     % TypeList=1, CalcBtn=2, ClearBtn=3, CloseBtn=4 (based on control order in WINDOW)
     % Simulate: set values, press Calc, then Close
     Events = [set('SensorID', 42), set('Reading', 500), set('Weight', 20), 2, 4],
@@ -416,7 +416,7 @@ test_formdemo_exec :-
 
 test_odbcstore :-
     format("~nODBC store tests (in-memory):~n"),
-    read_file_to_string('../../clarion_projects/odbc-store/OdbcStore.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/odbc-store/OdbcStore.clw', Src, []),
     init_session(Src, S0),
     call_procedure(S0, 'ODBCOpen', [], R0, S1),
     check('ODBCOpen()', R0, 0),
@@ -439,7 +439,7 @@ test_odbcstore :-
 
 test_statslib :-
     format("~nStatsLib tests:~n"),
-    read_file_to_string('../../clarion_projects/stats-calc/StatsLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/stats-calc/StatsLib.clw', Src, []),
     exec_procedure(Src, 'Classify', [5], R1),
     check('Classify(5)=1 (Low)', R1, 1),
     exec_procedure(Src, 'Classify', [50], R2),
@@ -448,7 +448,7 @@ test_statslib :-
     check('Classify(150)=3 (High)', R3, 3).
 
 test_statslib_exec :-
-    read_file_to_string('../../clarion_projects/stats-calc/StatsLib.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/stats-calc/StatsLib.clw', Src, []),
     exec_procedure(Src, 'CalculateStats', [3], R1),
     check('CalculateStats(3)=0', R1, 0).
 
@@ -1111,7 +1111,7 @@ test_ui_close_no_window :-
 %------------------------------------------------------------
 
 test_parse_qualnames :-
-    read_file_to_string('../../clarion_projects/qualified-names/QualNames.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/qualified-names/QualNames.clw', Src, []),
     ( parse_clarion(Src, _AST) ->
         check('Parse QualNames.clw', ok, ok)
     ;   check('Parse QualNames.clw', failed, ok)
@@ -1131,7 +1131,7 @@ test_nested_group_in_group :-
 
 test_qualnames_full :-
     % Full QualNames project: FILE with nested GROUP + top-level nested GROUP
-    read_file_to_string('../../clarion_projects/qualified-names/QualNames.clw', Src, []),
+    read_file_to_string('../../../clarion_projects/qualified-names/QualNames.clw', Src, []),
     init_session(Src, S0),
     call_procedure(S0, 'InitDose', [], R0, S1),
     check('QN InitDose()', R0, 0),
