@@ -383,11 +383,19 @@ control_decl(list_ctl(Attrs, UseRef, Drop, Items)) -->
     control_attrs_with_use(AllAttrs, UseRef),
     { extract_list_attrs(AllAttrs, Drop, Items, Attrs) }.
 
-% Format picture: @n9, @s30, etc.
+% Format picture: @n9, @s30, @n-5, @n-5.1, @D17, @T7, etc.
 format_picture(Format) -->
     "@", [T], { T >= 0'a, T =< 0'z ; T >= 0'A, T =< 0'Z },
-    digits(Ds), { Ds \= [] },
-    { atom_codes(Format, [0'@, T | Ds]) }.
+    opt_minus(Ms),
+    digits(Ds),
+    opt_dot_digits(DotDs),
+    { append(Ms, Ds, MDs), append(MDs, DotDs, Suffix), Suffix \= [] },
+    { atom_codes(Format, [0'@, T | Suffix]) }.
+
+opt_minus([0'-]) --> "-".
+opt_minus([]) --> [].
+opt_dot_digits([0'.|Ds]) --> ".", digits(Ds), { Ds \= [] }.
+opt_dot_digits([]) --> [].
 
 % Control attributes (comma-separated)
 control_attrs_with_use(Attrs, UseRef) -->

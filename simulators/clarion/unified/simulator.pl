@@ -172,6 +172,10 @@ control_equate_name(entry(_, _, equate(Name)), Name).
 control_equate_name(list_ctl(_, equate(Name), _, _), Name).
 control_equate_name(string_ctl(_, _, equate(Name)), Name).
 control_equate_name(prompt(_, _, equate(Name)), Name).
+control_equate_name(check(_, _, equate(Name)), Name).
+% USE(VarName) without ? — Clarion implicitly creates ?VarName equate
+control_equate_name(check(_, _, var(Name)), Name).
+control_equate_name(entry(_, _, var(Name)), Name).
 
 init_group(Name, Prefix, Fields, StateIn, StateOut) :-
     create_group_value(Fields, GroupValue),
@@ -597,7 +601,43 @@ exec_accept_loop(Body, StateIn, StateOut, Control, _Phase) :-
             atom_concat('__CHOICE__', EqName, ChoiceKey),
             set_var(ChoiceKey, Index, State1, State2),
             exec_accept_loop(Body, State2, StateOut, Control, accepted)
-        ;   % Button press event — set __ACCEPTED__ and run body
+        ; Event = accepted(EqName) ->
+            % Accepted event — set __ACCEPTED__ to equate and __EVENT__ to EVENT:Accepted (1)
+            ( get_var(equate(EqName), State1, EqVal) -> true ; EqVal = 0 ),
+            set_var('__ACCEPTED__', EqVal, State1, StateA1),
+            set_var('__EVENT__', 1, StateA1, State2),
+            exec_statements(Body, State2, State3, BodyControl),
+            ( BodyControl = break
+            -> StateOut = State3, Control = normal
+            ; BodyControl = return(V)
+            -> StateOut = State3, Control = return(V)
+            ; exec_accept_loop(Body, State3, StateOut, Control, accepted)
+            )
+        ; Event = selected(EqName) ->
+            % Selected event — set __ACCEPTED__ to equate and __EVENT__ to EVENT:Selected (2)
+            ( get_var(equate(EqName), State1, EqVal2) -> true ; EqVal2 = 0 ),
+            set_var('__ACCEPTED__', EqVal2, State1, StateS1),
+            set_var('__EVENT__', 2, StateS1, State2),
+            exec_statements(Body, State2, State3, BodyControl),
+            ( BodyControl = break
+            -> StateOut = State3, Control = normal
+            ; BodyControl = return(V)
+            -> StateOut = State3, Control = return(V)
+            ; exec_accept_loop(Body, State3, StateOut, Control, accepted)
+            )
+        ; Event = new_selection(EqName) ->
+            % NewSelection event — set __ACCEPTED__ to equate and __EVENT__ to EVENT:NewSelection (17)
+            ( get_var(equate(EqName), State1, EqVal3) -> true ; EqVal3 = 0 ),
+            set_var('__ACCEPTED__', EqVal3, State1, StateN1),
+            set_var('__EVENT__', 17, StateN1, State2),
+            exec_statements(Body, State2, State3, BodyControl),
+            ( BodyControl = break
+            -> StateOut = State3, Control = normal
+            ; BodyControl = return(V)
+            -> StateOut = State3, Control = return(V)
+            ; exec_accept_loop(Body, State3, StateOut, Control, accepted)
+            )
+        ;   % Button press event (integer) — set __ACCEPTED__ only (legacy path)
             set_var('__ACCEPTED__', Event, State1, State2),
             exec_statements(Body, State2, State3, BodyControl),
             ( BodyControl = break

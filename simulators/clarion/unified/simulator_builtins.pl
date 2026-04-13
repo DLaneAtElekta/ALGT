@@ -499,19 +499,28 @@ nth0_key(Idx, Record, Key) :-
 % Window Event Functions
 %------------------------------------------------------------
 
-% EVENT() - Get current window event (for ACCEPT loop simulation)
-builtin_call('EVENT', [], StateIn, StateIn, EventCode) :-
-    get_event_phase(StateIn, Phase),
-    phase_to_event(Phase, EventCode).
+% EVENT() - Get current event code (set by ACCEPT loop event handlers)
+% Falls back to phase-based lookup for legacy integer-event path
+builtin_call('EVENT', [], StateIn, StateIn, Value) :-
+    ( get_var('__EVENT__', StateIn, Value) -> true
+    ; get_event_phase(StateIn, Phase),
+      phase_to_event(Phase, Value)
+    ).
 
-phase_to_event(open_window, 'EVENT:OpenWindow').
-phase_to_event(close_window, 'EVENT:CloseWindow').
-phase_to_event(accepted, 'EVENT:Accepted').
+phase_to_event(open_window, 4).   % EVENT:OpenWindow
+phase_to_event(close_window, 5).  % EVENT:CloseWindow
+phase_to_event(accepted, 1).      % EVENT:Accepted
 phase_to_event(_, 0).
 
 % ACCEPTED() - Get last accepted control equate number
 builtin_call('ACCEPTED', [], StateIn, StateIn, Value) :-
     ( get_var('__ACCEPTED__', StateIn, Value) -> true ; Value = 0 ).
+
+% FIELD() - Get control equate number of field that generated the event
+% In the simulator, this is the same as ACCEPTED() since events target controls
+builtin_call('FIELD', [], StateIn, StateIn, Value) :-
+    ( get_var('__ACCEPTED__', StateIn, Value) -> true ; Value = 0 ).
+
 
 % SELECT(control) - Select a control (no-op for non-GUI)
 builtin_call('SELECT', [_Control], StateIn, StateIn, none).
@@ -529,6 +538,10 @@ builtin_call('BEEP', [], StateIn, StateIn, none).
 
 % DISPLAY - Refresh window display (no-op for non-GUI)
 builtin_call('DISPLAY', [], StateIn, StateIn, none).
+
+% ENABLE/DISABLE - Control visibility (no-op in headless simulation)
+builtin_call('ENABLE', [_], StateIn, StateIn, none).
+builtin_call('DISABLE', [_], StateIn, StateIn, none).
 
 %------------------------------------------------------------
 % Event Phase Management

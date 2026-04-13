@@ -24,6 +24,7 @@
     run_file/1,                % run_file(+FileName)
     exec_procedure/4,          % exec_procedure(+Source, +ProcName, +Args, -Result)
     exec_program/3,            % exec_program(+Source, +Events, -Result)
+    exec_program_state/3,      % exec_program_state(+Source, +Events, -FinalState)
     init_session/2,            % init_session(+Source, -Session)
     call_procedure/5           % call_procedure(+Session, +ProcName, +Args, -Result, -Session2)
 ]).
@@ -103,11 +104,32 @@ exec_program(Source, Events, Result) :-
     simulator:init_map_protos(MapDecls, InitState, State0),
     simulator:init_procedures(Procedures, State0, State1),
     simulator:init_globals(GlobalDecls, State1, State2),
+    init_event_constants(State2, State2b),
     % Store events for the accept loop to consume
-    set_event_queue(Events, State2, State3),
+    set_event_queue(Events, State2b, State3),
     exec_statements(MainBody, State3, FinalState, _Control),
     % Extract Result variable if it exists
     ( get_var('Result', FinalState, Result) -> true ; Result = 0 ).
+
+exec_program_state(Source, Events, FinalState) :-
+    parse_clarion(Source, SimpleAST),
+    bridge_ast(SimpleAST, ModAST),
+    ModAST = program(map(MapDecls), GlobalDecls, code(MainBody), Procedures),
+    empty_state(InitState),
+    simulator:init_map_protos(MapDecls, InitState, State0),
+    simulator:init_procedures(Procedures, State0, State1),
+    simulator:init_globals(GlobalDecls, State1, State2),
+    init_event_constants(State2, State2b),
+    set_event_queue(Events, State2b, State3),
+    exec_statements(MainBody, State3, FinalState, _Control).
+
+% Standard Clarion EVENT equates (runtime constants)
+init_event_constants(S0, S5) :-
+    set_var('EVENT:Accepted', 1, S0, S1),
+    set_var('EVENT:Selected', 2, S1, S2),
+    set_var('EVENT:NewSelection', 17, S2, S3),
+    set_var('EVENT:OpenWindow', 4, S3, S4),
+    set_var('EVENT:CloseWindow', 5, S4, S5).
 
 %------------------------------------------------------------
 % Event queue management

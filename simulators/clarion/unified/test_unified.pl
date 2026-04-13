@@ -403,9 +403,10 @@ test_form_no_events :-
 
 test_formdemo_exec :-
     read_file_to_string('../../../clarion_projects/form-demo/FormDemo.clw', Src, []),
-    % TypeList=1, CalcBtn=2, ClearBtn=3, CloseBtn=4 (based on control order in WINDOW)
+    % With implicit equates for USE(Var) controls:
+    % SensorID=1, Reading=2, Weight=3, TypeList=4, CalcBtn=5, ClearBtn=6, CloseBtn=7, Result=8
     % Simulate: set values, press Calc, then Close
-    Events = [set('SensorID', 42), set('Reading', 500), set('Weight', 20), 2, 4],
+    Events = [set('SensorID', 42), set('Reading', 500), set('Weight', 20), 5, 7],
     exec_program(Src, Events, R),
     % Default SensorType=1 (CHOICE defaults to 1), so: ((500*20)/100)*1 = 100
     check('FormDemo.clw calc: ((500*20)/100)*1=100', R, 100).

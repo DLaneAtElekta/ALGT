@@ -124,8 +124,9 @@ clear_continuation(StateIn, StateOut) :-
 % Get variable value from state
 % Handles both regular variables and prefixed file fields (Prefix:Field)
 get_var(Name, State, Value) :-
-    ( parse_prefixed_name(Name, Prefix, FieldName)
-    -> get_prefixed_var(Prefix, FieldName, State, Value)
+    ( parse_prefixed_name(Name, Prefix, FieldName),
+      get_prefixed_var(Prefix, FieldName, State, Value)
+    -> true
     ;  get_vars(State, Vars),
        member(var(Name, Value), Vars)
     ), !.
@@ -136,8 +137,9 @@ get_var(Name, _, _) :-
 % Set variable value in state
 % Handles both regular variables and prefixed file fields (Prefix:Field)
 set_var(Name, Value, StateIn, StateOut) :-
-    ( parse_prefixed_name(Name, Prefix, FieldName)
-    -> set_prefixed_var(Prefix, FieldName, Value, StateIn, StateOut)
+    ( parse_prefixed_name(Name, Prefix, FieldName),
+      set_prefixed_var(Prefix, FieldName, Value, StateIn, StateOut)
+    -> true
     ;  StateIn = state(Vars, Procs, Out, Files, Err, Classes, Self, UI, Cont),
        ( select(var(Name, _), Vars, RestVars)
        -> NewVars = [var(Name, Value)|RestVars]
