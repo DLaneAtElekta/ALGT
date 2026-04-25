@@ -132,3 +132,23 @@ UPDATE tm."Patients"
        "PostalCode" = '62704'
  WHERE "MRN" = 'MRN0002';
 COMMIT;
+
+\echo === T10: Amend plan PLAN-A1 (re-plan after delivered fraction 1) ===
+-- Mosaiq-style SET_ID versioning in action:
+--   * Closes v1 (Status -> Superseded, IsCurrent = FALSE, EndedAt = NOW)
+--   * Inserts v2 sharing the same PlanSetID, PlanVersion = 2, Status = Draft
+-- The future Prolog DCG should observe these two events as a single
+-- amendment transition on the plan stream identified by PlanSetID.
+BEGIN;
+SELECT tm.amend_plan(
+    (SELECT "PlanID" FROM tm."TreatmentPlans" WHERE "PlanCode"='PLAN-A1' AND "IsCurrent"),
+    'dr.chen'
+);
+-- Re-prescribe at a slightly higher dose for v2.
+UPDATE tm."TreatmentPlans"
+   SET "PrescribedDose"   = 5400.00,
+       "Fractions"        = 27,
+       "DosePerFraction"  = 200.00
+ WHERE "PlanCode" = 'PLAN-A1'
+   AND "IsCurrent" = TRUE;
+COMMIT;

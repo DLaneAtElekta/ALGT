@@ -62,14 +62,20 @@ object dmMain: TdmMain
     Database = Connection
     Transaction = MainTrans
     SQL.Strings = (
+      '-- Plans browse query. Filters to current versions only (IsCurrent=TRUE).'
+      '-- The full version history is reachable via tm."TreatmentPlans" without'
+      '-- the filter, or by clicking [Show Versions] on the plan form.'
       'SELECT'
-      '    p."PlanID", p."PatientID", p."PlanCode", p."PlanName",'
+      '    p."PlanID", p."PlanSetID", p."PlanVersion",'
+      '    p."EffectiveAt", p."EndedAt", p."IsCurrent",'
+      '    p."PatientID", p."PlanCode", p."PlanName",'
       '    p."Diagnosis", p."TreatmentSite", p."PrescribedDose",'
       '    p."Fractions", p."DosePerFraction", p."PlanStatus",'
       '    p."ApprovedBy", p."ApprovedAt", p."Notes", p."RowVersion",'
       '    pa."MRN" || '' '' || pa."LastName" || '', '' || pa."FirstName" AS "PatientLabel"'
       'FROM tm."TreatmentPlans" p'
       'JOIN tm."Patients" pa ON pa."PatientID" = p."PatientID"'
+      'WHERE p."IsCurrent" = TRUE'
       'ORDER BY pa."LastName", pa."FirstName", p."PlanCode"'
     )
     Params = <>
@@ -165,10 +171,13 @@ object dmMain: TdmMain
     Transaction = MainTrans
     SQL.Strings = (
       'SELECT p."PlanID", p."PatientID", p."PlanCode", p."PlanStatus",'
-      '       p."PlanCode" || '' ['' || p."PlanStatus" || ''] '' ||'
+      '       p."PlanSetID", p."PlanVersion",'
+      '       p."PlanCode" || '' v'' || p."PlanVersion" ||'
+      '       '' ['' || p."PlanStatus" || ''] '' ||'
       '       pa."LastName" || '', '' || pa."FirstName" AS "Label"'
       'FROM tm."TreatmentPlans" p'
       'JOIN tm."Patients" pa ON pa."PatientID" = p."PatientID"'
+      'WHERE p."IsCurrent" = TRUE'
       'ORDER BY pa."LastName", pa."FirstName", p."PlanCode"'
     )
     Params = <>

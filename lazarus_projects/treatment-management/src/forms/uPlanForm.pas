@@ -25,7 +25,9 @@ type
     pnlEdit:          TPanel;
     DBNavigator1:     TDBNavigator;
     btnApprove:       TBitBtn;
+    btnAmend:         TBitBtn;
     btnClose:         TBitBtn;
+    lblVersion:       TLabel;
     lblPatient:       TLabel;
     cmbPatient:       TDBLookupComboBox;
     lblPlanCode:      TLabel;
@@ -54,6 +56,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure btnApproveClick(Sender: TObject);
+    procedure btnAmendClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
     procedure qryAfterInsert(DataSet: TDataSet);
     procedure qryBeforePost(DataSet: TDataSet);
@@ -155,6 +158,69 @@ begin
   Q.Post;  // AfterPost commits
 end;
 
+// IMPAC/Mosaiq-style amendment: closes the current version and creates a
+// new draft version with the same PlanSetID. Calls tm.amend_plan() on
+// the server so the close/insert pair is atomic.
+procedure TfrmPlan.btnAmendClick(Sender: TObject);
+var
+  Q:        TDataSet;
+  CurId:    Integer;
+  NewId:    Integer;
+  Cmd:      TSQLQuery;
+begin
+  Q := dmMain.qryPlans;
+  if Q.IsEmpty then Exit;
+
+  if not Q.FieldByName('IsCurrent').AsBoolean then
+  begin
+    MessageDlg('Not Current',
+      'This is a historical version and cannot be amended directly. ' +
+      'Navigate to the current version of plan set ' +
+      Q.FieldByName('PlanSetID').AsString + ' first.',
+      mtInformation, [mbOK], 0);
+    Exit;
+  end;
+
+  if MessageDlg('Amend Plan',
+       Format('Close v%d of %s and create a new draft v%d?',
+              [Q.FieldByName('PlanVersion').AsInteger,
+               Q.FieldByName('PlanCode').AsString,
+               Q.FieldByName('PlanVersion').AsInteger + 1]),
+       mtConfirmation, [mbYes, mbNo], 0) <> mrYes then Exit;
+
+  if Q.State in [dsEdit, dsInsert] then Q.Post;
+  CurId := Q.FieldByName('PlanID').AsInteger;
+
+  Cmd := TSQLQuery.Create(nil);
+  try
+    Cmd.Database := dmMain.Connection;
+    Cmd.Transaction := dmMain.MainTrans;
+    Cmd.SQL.Text :=
+      'SELECT tm.amend_plan(:plan_id, :amended_by) AS new_id';
+    Cmd.ParamByName('plan_id').AsInteger := CurId;
+    Cmd.ParamByName('amended_by').AsString := AppCfg.Operator;
+    Cmd.Open;
+    NewId := Cmd.FieldByName('new_id').AsInteger;
+    Cmd.Close;
+  finally
+    Cmd.Free;
+  end;
+
+  dmMain.CommitWork;
+  dmMain.RefreshLookups;
+
+  // Refetch and locate the new draft version.
+  Q.Close;
+  Q.Open;
+  Q.Locate('PlanID', NewId, []);
+  RefreshStatus;
+
+  MessageDlg('Amended',
+    Format('Created new draft v%d. Edit and re-Approve to activate.',
+           [Q.FieldByName('PlanVersion').AsInteger]),
+    mtInformation, [mbOK], 0);
+end;
+
 procedure TfrmPlan.qryAfterInsert(DataSet: TDataSet);
 begin
   DataSet.FieldByName('PlanStatus').AsString := 'Draft';
@@ -239,13 +305,32 @@ end;
 procedure TfrmPlan.RefreshStatus;
 var
   Q: TDataSet;
+  CurMark: string;
 begin
   Q := dmMain.qryPlans;
   if Q.Active and not Q.IsEmpty then
-    StatusBar1.SimpleText := Format('Record %d of %d  |  %s',
-      [Q.RecNo, Q.RecordCount, Q.FieldByName('PlanCode').AsString])
+  begin
+    if Q.FieldByName('IsCurrent').AsBoolean then
+      CurMark := 'CURRENT'
+    else
+      CurMark := 'historical';
+    StatusBar1.SimpleText := Format(
+      'Record %d of %d  |  %s v%d (set %d, %s)',
+      [Q.RecNo, Q.RecordCount,
+       Q.FieldByName('PlanCode').AsString,
+       Q.FieldByName('PlanVersion').AsInteger,
+       Q.FieldByName('PlanSetID').AsInteger,
+       CurMark]);
+    lblVersion.Caption := Format('v%d (set %d) — %s',
+      [Q.FieldByName('PlanVersion').AsInteger,
+       Q.FieldByName('PlanSetID').AsInteger,
+       CurMark]);
+  end
   else
+  begin
     StatusBar1.SimpleText := '(no plans)';
+    lblVersion.Caption := '';
+  end;
 end;
 
 end.

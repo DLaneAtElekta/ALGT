@@ -14,12 +14,23 @@
 --            data from the existing CreatedBy / UpdatedAt columns. Did
 --            not. Now both conventions exist on the same tables.
 --
---   2011-08: TreatmentPlans had a self-FK OldPlanID for plan revisions.
---            The constraint caused a circular reference during a 2011
---            archive job. Park (then a contractor) dropped the constraint
---            but left the column. Some rows still have meaningful values.
---            Most are NULL. The application no longer reads or writes
---            this column.
+--   2011-08: A contractor (D. Whitfield, here for six weeks) decided
+--            TreatmentPlans needed version tracking and added OldPlanID
+--            as a self-FK to the predecessor plan. The actual SET_ID /
+--            PlanVersion versioning has existed in the schema since 1996
+--            (see migration 001) but Whitfield was not given a tour of
+--            the schema and never queried the catalog. The new column
+--            shipped, ran in parallel with the working SET_ID system
+--            for two months, then caused a circular reference during a
+--            2011 archive job. Park (then also a contractor) dropped
+--            the FK constraint but left the column. ~12% of rows have
+--            meaningful values from those two months; they tend to
+--            disagree with the SET_ID lineage by 0-2 versions because
+--            Whitfield was off-by-one on amendments. The application
+--            no longer reads or writes OldPlanID; reports that filter
+--            via OldPlanID IS NULL are inadvertently filtering out a
+--            slice of the August-October 2011 production data and
+--            nobody has caught it.
 --
 --   2018-03: contractor B. Lim renamed the audit columns "for clarity":
 --            CreatedBy → who_created, UpdatedBy → who_updated. Lim left
@@ -69,7 +80,7 @@ ALTER TABLE tm."TreatmentPlans"
 -- for historical revision linkage. Application no longer reads or writes it.
 
 COMMENT ON COLUMN tm."TreatmentPlans"."OldPlanID" IS
-    'Former self-FK to predecessor plan. Constraint dropped 2011-08. Column retained. Application does not write it. Historical values exist on ~12% of rows.';
+    'Whitfield 2011 attempt at versioning, parallel to the SET_ID system that already existed. FK constraint dropped 2011-08 after a circular reference incident. ~12% of rows have values from Aug-Oct 2011; off-by-one against PlanSetID/PlanVersion. Reports filtering OldPlanID IS NULL silently exclude that slice.';
 
 -- ----------------------------------------------------------------------------
 -- Lim's "rename" remnants (2018)

@@ -89,10 +89,59 @@ Four core entities under the `tm` schema:
 | Appointments       | Scheduled visits (consult / sim / treatment)     |
 | TreatmentSessions  | Per-fraction delivery, offsets, magnitude        |
 
-The schema in `001_initial_schema.sql` is the *original* clean 1996 design.
-Migrations 003–011 layer on roughly 25 years of feature creep,
-performance hacks, regulatory flotsam, and contractor remnants — see
-**Schema Stratigraphy** below.
+The schema in `001_initial_schema.sql` is the *original* 1996 design,
+including IMPAC/Mosaiq-style **SET_ID versioning** on `TreatmentPlans`
+(see below). Migrations 003–011 layer on roughly 25 years of feature
+creep, performance hacks, regulatory flotsam, and contractor remnants
+— see **Schema Stratigraphy** below.
+
+### SET_ID versioning (TreatmentPlans)
+
+Modeled on the IMPAC/Mosaiq pattern used in oncology information
+systems since the late 1990s. Every row in `TreatmentPlans` carries:
+
+| Column        | Role                                                       |
+|---------------|------------------------------------------------------------|
+| `PlanID`      | Physical row PK; allocated from `tm.plan_obj_seq`          |
+| `PlanSetID`   | Logical plan identity, shared across versions; for v1 it equals PlanID |
+| `PlanVersion` | 1, 2, 3, … within the set                                  |
+| `EffectiveAt` | When this version became effective                         |
+| `EndedAt`     | When superseded; `NULL` for the current version            |
+| `IsCurrent`   | Boolean; partial unique index ensures one current per set  |
+
+A new plan is just an INSERT — the `TR_Plans_DefaultSetID` trigger sets
+`PlanSetID := PlanID` for v1. To amend a plan (re-prescription, dose
+change, replan after offset, etc.) call:
+
+```sql
+SELECT tm.amend_plan(<plan_id>, <user>);
+```
+
+This atomically:
+1. Closes the current row (`IsCurrent := FALSE`, `EndedAt := NOW()`,
+   `PlanStatus := 'Superseded'`)
+2. Inserts a new row with the same `PlanSetID`, `PlanVersion + 1`,
+   clinical fields copied from the previous version, `PlanStatus :=
+   'Draft'`, `ApprovedBy / ApprovedAt` cleared so it must be
+   re-approved before delivery.
+
+The Pascal `uPlanForm` exposes this as the **[Amend / New Version]**
+button. Browse queries default to the `vw_TreatmentPlans_Current` view
+(or `WHERE "IsCurrent" = TRUE`); the full version history is reachable
+by querying `tm."TreatmentPlans"` directly.
+
+`Appointments.PlanID` and `TreatmentSessions.PlanID` reference the
+specific *version* a dependent row was created against, not the set.
+This is the audit-correct behavior: an appointment scheduled against
+v1 of a plan stays linked to v1 even after the plan is amended to v2.
+Reports that want "all appointments for plan set X regardless of
+version" must join via `PlanSetID`.
+
+The dead `OldPlanID` column added in 2011 (see migration 011) is a
+*second*, redundant attempt at versioning by a contractor who didn't
+realize the SET_ID system already existed. ~12% of rows have stale
+`OldPlanID` values from the two months it was in production; reports
+that filter `WHERE OldPlanID IS NULL` silently exclude that slice.
 
 ### Schema Stratigraphy
 
@@ -102,7 +151,7 @@ in that era:
 
 | Layer | File                                       | Theme                                                        |
 |-------|--------------------------------------------|--------------------------------------------------------------|
-| 1996  | `001_initial_schema.sql`                   | Clean 3NF — the way it was meant to be                       |
+| 1996  | `001_initial_schema.sql`                   | Clean 3NF + IMPAC/Mosaiq-style SET_ID versioning on TreatmentPlans (PlanSetID/PlanVersion/IsCurrent + amend_plan() helper) |
 | 1997  | `002_logical_replication.sql`              | (modern hindsight: `wal_level=logical` + publication)        |
 | 2001  | `003_era_2001_just_add_columns.sql`        | `IsActive` shadow flag, marital status, 3× insurance, pipe-delimited spouse info |
 | 2003  | `004_era_2003_y2k_aftershock.sql`          | `DateOfBirth_Char` shadow column for Cognos; `Patients_OLD` orphan |
@@ -112,7 +161,7 @@ in that era:
 | 2010  | `008_era_2010_vendor_integration.sql`      | `ExternalSchedulingID` (3 incompatible formats), `LinacRawXML`, `Z_Backup_Sessions_2009` orphan |
 | 2013  | `009_era_2013_multi_site.sql`              | `SiteCode` on every table; `NULL` and `'MAIN'` mean the same thing; rogue `'NW'` site code |
 | 2015  | `010_era_2015_status_flag_accretion.sql`   | Five parallel boolean/CHAR/SMALLINT flags on `Appointments` whose sync trigger was disabled in 2017 (TM-4471) |
-|  —    | `011_era_misc_warts.sql`                   | Catch-all: snake_case `entry_user`/`last_modified` shadows, dangling `OldPlanID`, Lim's 2018 abandoned rename (`who_created`/`who_updated`) |
+|  —    | `011_era_misc_warts.sql`                   | Catch-all: snake_case `entry_user`/`last_modified` shadows, redundant `OldPlanID` (2011 contractor's parallel re-implementation of versioning that already existed), Lim's 2018 abandoned rename (`who_created`/`who_updated`) |
 
 ### Known Drift Patterns
 
@@ -277,6 +326,7 @@ adds the Clarion-style queue semantics on top.
 | Lazarus fat client (M1: scaffold) | done | n/a (the source of truth) |
 | Lazarus fat client (M2: all four forms + lifecycle) | done | n/a |
 | Schema rot (M2.5: 25 years of feature creep simulated) | done | `02_workflow_postdenorm.wal.jsonl` |
+| Mosaiq-style SET_ID versioning on TreatmentPlans | done | xid 1010 in `01_clinical_workflow.wal.jsonl` |
 | Prolog DCG / LTS model | planned | consume `*.wal.jsonl`; detect drift |
 | Elixir port (Commanded + :eventstore) | planned | replay WAL → derive aggregates |
 
