@@ -230,6 +230,46 @@ Form code rejects illegal transitions client-side; the Postgres `CHECK`
 constraints enforce the value space. Together they constrain the WAL
 event stream the DCG will accept.
 
+## Clarion-style ACCEPT Loop
+
+`src/uClarionLoop.pas` provides a `TAcceptLoop` class that translates
+Clarion's `ACCEPT … END` idiom into Lazarus. Each form owns a loop;
+button `OnClick` handlers each call `Loop.Post(EV_ACCEPTED, FLD_xxx)`,
+and a single `HandleEvent` method does the equivalent of Clarion's
+central `CASE EVENT() OF / CASE FIELD() OF` dispatcher.
+
+`Maintain → Tools → ACCEPT loop demo…` opens `uAcceptDemoForm`, a
+self-contained reference implementation. Every event the loop sees is
+written to `<temp>/accept_demo.evt` in a format compatible with
+`clarion_projects/form-cli/*.evt` so the planned Prolog DCG can replay
+either source uniformly.
+
+Event constants in `uClarionLoop`:
+
+| Pascal             | Clarion equivalent       |
+|--------------------|--------------------------|
+| `EV_OPEN_WINDOW`   | `EVENT:OpenWindow`       |
+| `EV_CLOSE_WINDOW`  | `EVENT:CloseWindow`      |
+| `EV_ACCEPTED`      | `EVENT:Accepted`         |
+| `EV_REJECTED`      | `EVENT:Rejected`         |
+| `EV_SELECTED`      | `EVENT:Selected`         |
+| `EV_NEW_SELECTION` | `EVENT:NewSelection`     |
+| `EV_TIMER`         | `EVENT:Timer`            |
+| `EV_USER + N`      | `EVENT:User + N`         |
+
+Methods on `TAcceptLoop` matching Clarion verbs:
+
+| Pascal       | Clarion          | Effect                                    |
+|--------------|------------------|-------------------------------------------|
+| `Post(K,F)`  | `POST(EVENT,FLD)`| push event onto the queue                 |
+| `Break_`     | `BREAK`          | exit the ACCEPT loop                      |
+| `Cycle`      | `CYCLE`          | skip remaining handlers, continue loop    |
+| `Run`        | `ACCEPT`         | block, pumping LCL messages, until `Break_` |
+
+The main loop body is a thin wrapper around `Application.ProcessMessages`
+so all standard Lazarus widget input still works — TAcceptLoop just
+adds the Clarion-style queue semantics on top.
+
 ## Modeling Roadmap
 
 | Stage | Status | Trace Boundary             |

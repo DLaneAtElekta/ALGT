@@ -86,6 +86,13 @@ object frmMain: TfrmMain
         OnClick = mnuSessionsClick
       end
     end
+    object mnuTools: TMenuItem
+      Caption = '&Tools'
+      object mnuAcceptDemo: TMenuItem
+        Caption = '&ACCEPT loop demo...'
+        OnClick = mnuAcceptDemoClick
+      end
+    end
     object mnuHelp: TMenuItem
       Caption = '&Help'
       object mnuHelpAbout: TMenuItem
