@@ -1,0 +1,47 @@
+object dmMain: TdmMain
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
+  Height = 240
+  HorizontalOffset = 481
+  VerticalOffset = 264
+  Width = 320
+  object Connection: TPQConnection
+    Connected = False
+    KeepConnection = True
+    LoginPrompt = False
+    Transaction = MainTrans
+    Left = 56
+    Top = 24
+  end
+  object MainTrans: TSQLTransaction
+    Action = caCommit
+    Database = Connection
+    Options = []
+    Left = 184
+    Top = 24
+  end
+  object qryPatients: TSQLQuery
+    FieldDefs = <>
+    Database = Connection
+    Transaction = MainTrans
+    SQL.Strings = (
+      'SELECT'
+      '    "PatientID", "MRN", "LastName", "FirstName", "MiddleName",'
+      '    "DateOfBirth", "Sex", "PhoneHome", "PhoneMobile", "Email",'
+      '    "Active", "RowVersion"'
+      'FROM tm."Patients"'
+      'ORDER BY "LastName", "FirstName"'
+    )
+    Params = <>
+    UpdateMode = upWhereKeyOnly
+    UsePrimaryKeyAsKey = True
+    Left = 56
+    Top = 96
+  end
+  object dsPatients: TDataSource
+    DataSet = qryPatients
+    Left = 184
+    Top = 96
+  end
+end
