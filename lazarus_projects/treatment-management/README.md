@@ -8,9 +8,13 @@ logic in form event handlers, no middle tier.
 This is the first stage of a three-step modeling exercise:
 
 1. **Lazarus + Postgres** (this project) — the period-correct fat client.
-2. **LTS / Logtalk Prolog model** — consumes Postgres WAL events via
-   logical decoding (the "LDF events" of Postgres) and verifies the
-   model produces the same state evolution.
+2. **Idiomatic Prolog LTS model** — a DCG over the Postgres WAL event
+   stream (the "LDF events" of Postgres, surfaced via logical decoding).
+   The grammar *is* the labelled transition system: non-terminals are
+   states, productions are transitions, and recognition of a
+   `*.wal.jsonl` trace verifies the model accepts the same lifecycle the
+   fat client produced. No Logtalk objects — plain Prolog + DCG, in the
+   same style as `simulators/clarion/unified/clarion_parser.pl`.
 3. **Elixir port** — Commanded + `:eventstore` (Postgres-backed event
    store), reusing the same WAL trace as the seed event log.
 
@@ -26,6 +30,9 @@ lazarus_projects/treatment-management/
     forms/
       uMainForm.pas + .lfm       # main menu form
       uPatientForm.pas + .lfm    # patient browse/edit
+      uPlanForm.pas + .lfm       # treatment plan browse/edit + Approve
+      uAppointmentForm.pas + .lfm# appointment browse/edit + lifecycle
+      uSessionForm.pas + .lfm    # session browse/edit + offset magnitude
   config/
     treatment_mgmt.ini.sample    # connection settings template
   db/
@@ -148,12 +155,31 @@ transitions:
 
 Total: 31 lines (9 transactions, 8 inserts, 5 updates).
 
+## Lifecycle Transitions (DCG-relevant)
+
+The forms surface explicit lifecycle buttons that the future Prolog DCG
+will mirror as productions over WAL events:
+
+| Entity              | Transitions                                                   |
+|---------------------|---------------------------------------------------------------|
+| TreatmentPlan       | Draft → UnderReview → Approved → Active → Completed           |
+|                     | * → Cancelled                                                  |
+| Appointment         | Scheduled → CheckedIn → InProgress → Completed                |
+|                     | Scheduled → Cancelled / NoShow                                 |
+| TreatmentSession    | Pending → InProgress → Completed                              |
+|                     | * → Aborted                                                    |
+
+Form code rejects illegal transitions client-side; the Postgres `CHECK`
+constraints enforce the value space. Together they constrain the WAL
+event stream the DCG will accept.
+
 ## Modeling Roadmap
 
 | Stage | Status | Trace Boundary             |
 |-------|--------|----------------------------|
-| Lazarus fat client | scaffolded (this milestone) | n/a (the source of truth) |
-| LTS / Logtalk model | planned | consume `*.wal.jsonl` |
+| Lazarus fat client (M1: scaffold) | done | n/a (the source of truth) |
+| Lazarus fat client (M2: all four forms + lifecycle) | done | n/a |
+| Prolog DCG / LTS model | planned | consume `*.wal.jsonl` |
 | Elixir port (Commanded + :eventstore) | planned | replay WAL → derive aggregates |
 
 The same WAL trace fixture verifies all three implementations agree on

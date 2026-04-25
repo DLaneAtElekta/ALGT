@@ -34,7 +34,6 @@ type
     procedure mnuSessionsClick(Sender: TObject);
     procedure mnuHelpAboutClick(Sender: TObject);
   private
-    procedure NotImplemented(const What: string);
   public
   end;
 
@@ -44,7 +43,7 @@ var
 implementation
 
 uses
-  uPatientForm;
+  uPatientForm, uPlanForm, uAppointmentForm, uSessionForm;
 
 {$R *.lfm}
 
@@ -74,18 +73,39 @@ begin
 end;
 
 procedure TfrmMain.mnuPlansClick(Sender: TObject);
+var
+  F: TfrmPlan;
 begin
-  NotImplemented('Treatment Plans');
+  F := TfrmPlan.Create(Self);
+  try
+    F.ShowModal;
+  finally
+    F.Free;
+  end;
 end;
 
 procedure TfrmMain.mnuAppointmentsClick(Sender: TObject);
+var
+  F: TfrmAppointment;
 begin
-  NotImplemented('Appointments');
+  F := TfrmAppointment.Create(Self);
+  try
+    F.ShowModal;
+  finally
+    F.Free;
+  end;
 end;
 
 procedure TfrmMain.mnuSessionsClick(Sender: TObject);
+var
+  F: TfrmSession;
 begin
-  NotImplemented('Treatment Sessions');
+  F := TfrmSession.Create(Self);
+  try
+    F.ShowModal;
+  finally
+    F.Free;
+  end;
 end;
 
 procedure TfrmMain.mnuHelpAboutClick(Sender: TObject);
@@ -95,13 +115,6 @@ begin
     'Treatment Management System' + LineEnding +
     'Lazarus / FreePascal fat-client demo' + LineEnding + LineEnding +
     'INI: ' + AppCfg.IniPath,
-    mtInformation, [mbOK], 0);
-end;
-
-procedure TfrmMain.NotImplemented(const What: string);
-begin
-  MessageDlg('Not Implemented',
-    What + ' maintenance is not yet implemented in this milestone.',
     mtInformation, [mbOK], 0);
 end;
 

@@ -11,6 +11,9 @@ uses
   uDataModule,
   uMainForm,
   uPatientForm,
+  uPlanForm,
+  uAppointmentForm,
+  uSessionForm,
   uAppConfig;
 
 {$R *.res}

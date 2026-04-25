@@ -68,6 +68,30 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uPatientForm"/>
       </Unit>
+      <Unit>
+        <Filename Value="src/forms/uPlanForm.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmPlan"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="uPlanForm"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/forms/uAppointmentForm.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmAppointment"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="uAppointmentForm"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/forms/uSessionForm.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmSession"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="uSessionForm"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

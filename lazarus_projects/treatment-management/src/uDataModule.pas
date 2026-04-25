@@ -13,10 +13,23 @@ uses
 
 type
   TdmMain = class(TDataModule)
-    Connection:    TPQConnection;
-    MainTrans:     TSQLTransaction;
-    qryPatients:   TSQLQuery;
-    dsPatients:    TDataSource;
+    Connection:        TPQConnection;
+    MainTrans:         TSQLTransaction;
+    qryPatients:       TSQLQuery;
+    dsPatients:        TDataSource;
+    qryPlans:          TSQLQuery;
+    dsPlans:           TDataSource;
+    qryAppointments:   TSQLQuery;
+    dsAppointments:    TDataSource;
+    qrySessions:       TSQLQuery;
+    dsSessions:        TDataSource;
+    // Read-only lookup queries for combo boxes / lookup fields.
+    qryLookupPatients: TSQLQuery;
+    dsLookupPatients:  TDataSource;
+    qryLookupPlans:    TSQLQuery;
+    dsLookupPlans:     TDataSource;
+    qryLookupAppts:    TSQLQuery;
+    dsLookupAppts:     TDataSource;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
   private
@@ -24,6 +37,7 @@ type
     procedure ConnectToDatabase;
     procedure CommitWork;
     procedure RollbackWork;
+    procedure RefreshLookups;
   end;
 
 var
@@ -79,6 +93,21 @@ procedure TdmMain.RollbackWork;
 begin
   if MainTrans.Active then
     MainTrans.RollbackRetaining;
+end;
+
+procedure TdmMain.RefreshLookups;
+  procedure ReopenIfActive(Q: TSQLQuery);
+  begin
+    if Q.Active then
+    begin
+      Q.Close;
+      Q.Open;
+    end;
+  end;
+begin
+  ReopenIfActive(qryLookupPatients);
+  ReopenIfActive(qryLookupPlans);
+  ReopenIfActive(qryLookupAppts);
 end;
 
 end.
