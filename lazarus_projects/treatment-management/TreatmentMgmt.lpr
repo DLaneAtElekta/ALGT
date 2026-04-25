@@ -14,6 +14,8 @@ uses
   uPlanForm,
   uAppointmentForm,
   uSessionForm,
+  uClarionLoop,
+  uAcceptDemoForm,
   uAppConfig;
 
 {$R *.res}

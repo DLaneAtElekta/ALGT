@@ -92,6 +92,19 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uSessionForm"/>
       </Unit>
+      <Unit>
+        <Filename Value="src/uClarionLoop.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="uClarionLoop"/>
+      </Unit>
+      <Unit>
+        <Filename Value="src/forms/uAcceptDemoForm.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmAcceptDemo"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="uAcceptDemoForm"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

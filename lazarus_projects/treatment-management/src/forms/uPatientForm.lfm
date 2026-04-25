@@ -1,10 +1,10 @@
 object frmPatient: TfrmPatient
   Left = 220
-  Height = 540
+  Height = 720
   Top = 130
   Width = 820
   Caption = 'Patients'
-  ClientHeight = 540
+  ClientHeight = 720
   ClientWidth = 820
   OnClose = FormClose
   OnCreate = FormCreate
@@ -74,12 +74,12 @@ object frmPatient: TfrmPatient
   end
   object pnlEdit: TPanel
     Left = 0
-    Height = 277
+    Height = 457
     Top = 240
     Width = 820
     Align = alClient
     BevelOuter = bvLowered
-    ClientHeight = 277
+    ClientHeight = 457
     ClientWidth = 820
     TabOrder = 1
     object DBNavigator1: TDBNavigator
@@ -244,22 +244,158 @@ object frmPatient: TfrmPatient
       ValueChecked = 'True'
       ValueUnchecked = 'False'
     end
+    object grpAddedFields: TGroupBox
+      Left = 8
+      Height = 240
+      Top = 200
+      Width = 800
+      Anchors = [akTop, akLeft, akRight]
+      Caption = 'Additional info  (added 2001 - 2014)'
+      ClientHeight = 220
+      ClientWidth = 796
+      TabOrder = 11
+      object lblIsActive: TLabel
+        Left = 8
+        Height = 16
+        Top = 12
+        Width = 84
+        Caption = 'Status (rpts):'
+      end
+      object cmbIsActive: TDBComboBox
+        Left = 100
+        Height = 24
+        Top = 8
+        Width = 60
+        DataField = 'IsActive'
+        ItemHeight = 16
+        Items.Strings = (
+          'Y'
+          'N'
+          'X'
+        )
+        Style = csDropDownList
+        TabOrder = 0
+      end
+      object lblMarital: TLabel
+        Left = 180
+        Height = 16
+        Top = 12
+        Width = 56
+        Caption = 'Marital:'
+      end
+      object cmbMarital: TDBComboBox
+        Left = 240
+        Height = 24
+        Top = 8
+        Width = 60
+        DataField = 'MaritalStatus'
+        ItemHeight = 16
+        Items.Strings = (
+          'S'
+          'M'
+          'D'
+          'W'
+          'P'
+          'U'
+        )
+        Style = csDropDownList
+        TabOrder = 1
+      end
+      object lblSiteCode: TLabel
+        Left = 320
+        Height = 16
+        Top = 12
+        Width = 30
+        Caption = 'Site:'
+      end
+      object cmbSiteCode: TDBComboBox
+        Left = 360
+        Height = 24
+        Top = 8
+        Width = 80
+        DataField = 'SiteCode'
+        ItemHeight = 16
+        Items.Strings = (
+          'MAIN'
+          'WV'
+          'DT'
+          'NW'
+        )
+        TabOrder = 2
+      end
+      object lblInsurance: TLabel
+        Left = 8
+        Height = 16
+        Top = 50
+        Width = 130
+        Caption = 'Insurance / Policy:'
+      end
+      object edtInsCarrier: TDBEdit
+        Left = 140
+        Height = 24
+        Top = 46
+        Width = 200
+        DataField = 'InsuranceCarrier'
+        TabOrder = 3
+      end
+      object edtPolicyNumber: TDBEdit
+        Left = 350
+        Height = 24
+        Top = 46
+        Width = 160
+        DataField = 'PolicyNumber'
+        TabOrder = 4
+      end
+      object chkConsent1: TDBCheckBox
+        Left = 8
+        Height = 22
+        Top = 90
+        Width = 200
+        Caption = 'Consent rev 1 (2005)'
+        DataField = 'ConsentForm1Signed'
+        TabOrder = 5
+        ValueChecked = 'True'
+        ValueUnchecked = 'False'
+      end
+      object chkConsent2: TDBCheckBox
+        Left = 220
+        Height = 22
+        Top = 90
+        Width = 200
+        Caption = 'Consent rev 2 (2009)'
+        DataField = 'ConsentForm2Signed'
+        TabOrder = 6
+        ValueChecked = 'True'
+        ValueUnchecked = 'False'
+      end
+      object chkConsent3: TDBCheckBox
+        Left = 430
+        Height = 22
+        Top = 90
+        Width = 200
+        Caption = 'Consent rev 3 (2014)'
+        DataField = 'ConsentForm3Signed'
+        TabOrder = 7
+        ValueChecked = 'True'
+        ValueUnchecked = 'False'
+      end
+    end
     object btnClose: TBitBtn
       Left = 700
       Height = 30
-      Top = 230
+      Top = 460
       Width = 100
       Anchors = [akRight, akBottom]
       Caption = '&Close'
       Kind = bkClose
       OnClick = btnCloseClick
-      TabOrder = 11
+      TabOrder = 12
     end
   end
   object StatusBar1: TStatusBar
     Left = 0
     Height = 23
-    Top = 517
+    Top = 697
     Width = 820
     SimplePanel = True
   end

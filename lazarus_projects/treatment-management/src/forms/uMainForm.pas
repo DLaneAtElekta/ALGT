@@ -21,6 +21,8 @@ type
     mnuPlans:         TMenuItem;
     mnuAppointments:  TMenuItem;
     mnuSessions:      TMenuItem;
+    mnuTools:         TMenuItem;
+    mnuAcceptDemo:    TMenuItem;
     mnuHelp:          TMenuItem;
     mnuHelpAbout:     TMenuItem;
     StatusBar1:       TStatusBar;
@@ -32,6 +34,7 @@ type
     procedure mnuPlansClick(Sender: TObject);
     procedure mnuAppointmentsClick(Sender: TObject);
     procedure mnuSessionsClick(Sender: TObject);
+    procedure mnuAcceptDemoClick(Sender: TObject);
     procedure mnuHelpAboutClick(Sender: TObject);
   private
   public
@@ -43,7 +46,7 @@ var
 implementation
 
 uses
-  uPatientForm, uPlanForm, uAppointmentForm, uSessionForm;
+  uPatientForm, uPlanForm, uAppointmentForm, uSessionForm, uAcceptDemoForm;
 
 {$R *.lfm}
 
@@ -103,6 +106,22 @@ begin
   F := TfrmSession.Create(Self);
   try
     F.ShowModal;
+  finally
+    F.Free;
+  end;
+end;
+
+procedure TfrmMain.mnuAcceptDemoClick(Sender: TObject);
+var
+  F: TfrmAcceptDemo;
+begin
+  // The ACCEPT-loop form is non-modal but blocks the parent via its
+  // RunAcceptLoop call, mirroring the Clarion idiom:
+  //     OPEN(MyWindow); ACCEPT ... END; CLOSE(MyWindow)
+  F := TfrmAcceptDemo.Create(Self);
+  try
+    F.Show;
+    F.RunAcceptLoop;
   finally
     F.Free;
   end;
