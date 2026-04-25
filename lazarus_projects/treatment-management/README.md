@@ -80,7 +80,7 @@ The app searches for `treatment_mgmt.ini` in:
 
 ## Schema
 
-Four entities, all under the `tm` schema:
+Four core entities under the `tm` schema:
 
 | Table              | Purpose                                          |
 |--------------------|--------------------------------------------------|
@@ -89,13 +89,60 @@ Four entities, all under the `tm` schema:
 | Appointments       | Scheduled visits (consult / sim / treatment)     |
 | TreatmentSessions  | Per-fraction delivery, offsets, magnitude        |
 
-Every table has:
-- Surrogate `<Table>ID` PK
-- `RowVersion` integer bumped by trigger on UPDATE (optimistic concurrency)
-- `CreatedAt/By`, `UpdatedAt/By` audit columns
-- `CHECK` constraints on enum-valued status fields
+The schema in `001_initial_schema.sql` is the *original* clean 1996 design.
+Migrations 003–011 layer on roughly 25 years of feature creep,
+performance hacks, regulatory flotsam, and contractor remnants — see
+**Schema Stratigraphy** below.
 
-See `db/migrations/001_initial_schema.sql` for the full schema.
+### Schema Stratigraphy
+
+The `db/migrations/` directory is structured as archaeological layers.
+Each migration is dated in its header and adds the warts that accrued
+in that era:
+
+| Layer | File                                       | Theme                                                        |
+|-------|--------------------------------------------|--------------------------------------------------------------|
+| 1996  | `001_initial_schema.sql`                   | Clean 3NF — the way it was meant to be                       |
+| 1997  | `002_logical_replication.sql`              | (modern hindsight: `wal_level=logical` + publication)        |
+| 2001  | `003_era_2001_just_add_columns.sql`        | `IsActive` shadow flag, marital status, 3× insurance, pipe-delimited spouse info |
+| 2003  | `004_era_2003_y2k_aftershock.sql`          | `DateOfBirth_Char` shadow column for Cognos; `Patients_OLD` orphan |
+| 2005  | `005_era_2005_hipaa_creep.sql`             | `Notes2`, `AccessLog VARCHAR(4000)` truncating audit, three `ConsentFormN` flags, `Patient_Photos_DEPRECATED` orphan |
+| 2007  | `006_era_2007_icd_migration.sql`           | `DiagnosisCode_ICD9` and `DiagnosisCode_ICD10` alongside the original free-text `Diagnosis` |
+| 2008  | `007_era_2008_perf_denorm.sql`             | Snapshot columns (`PatientNameSnap`, `PlanCodeSnap`, `OffsetCSV`) populated by **INSERT-only** triggers — drift on every parent rename |
+| 2010  | `008_era_2010_vendor_integration.sql`      | `ExternalSchedulingID` (3 incompatible formats), `LinacRawXML`, `Z_Backup_Sessions_2009` orphan |
+| 2013  | `009_era_2013_multi_site.sql`              | `SiteCode` on every table; `NULL` and `'MAIN'` mean the same thing; rogue `'NW'` site code |
+| 2015  | `010_era_2015_status_flag_accretion.sql`   | Five parallel boolean/CHAR/SMALLINT flags on `Appointments` whose sync trigger was disabled in 2017 (TM-4471) |
+|  —    | `011_era_misc_warts.sql`                   | Catch-all: snake_case `entry_user`/`last_modified` shadows, dangling `OldPlanID`, Lim's 2018 abandoned rename (`who_created`/`who_updated`) |
+
+### Known Drift Patterns
+
+The denormalization is deliberate. The following pairs of columns are
+*supposed to agree* but predictably don't, and the planned Prolog DCG /
+LTS model uses them as the test surface for inconsistency detection:
+
+| Pair                                                     | Drift cause                                                            |
+|----------------------------------------------------------|------------------------------------------------------------------------|
+| `Patients.Active` ↔ `Patients.IsActive`                  | Two flag columns from 1996 and 2001; GUI / reports write different ones |
+| `Patients.DateOfBirth` ↔ `Patients.DateOfBirth_Char`     | Shadow column populated only on INSERT (2003 trigger)                  |
+| `Patients.LastName` ↔ `Appointments.PatientNameSnap`     | INSERT-only trigger; rename does not propagate                         |
+| `TreatmentPlans.PlanCode` ↔ `*.PlanCodeSnap`             | Same                                                                   |
+| `TreatmentSessions.Offset*` ↔ `OffsetCSV`                | Direct SQL `UPDATE` to offsets leaves CSV stale                        |
+| `Appointments.Status` ↔ `IsCancelled / WorkflowState / ReadyForBilling` | Sync trigger disabled October 2017 (TM-4471)            |
+| `*.UpdatedBy` ↔ `*.who_updated` ↔ `*.entry_user`         | Three audit conventions from three contractors                         |
+| `Patients.SiteCode IS NULL` ↔ `'MAIN'`                   | Convention only; reports lump them, code paths sometimes don't         |
+
+### Orphan Tables
+
+Three intentionally empty tables that nobody can drop:
+
+| Table                            | Era  | Why it persists                                          |
+|----------------------------------|------|----------------------------------------------------------|
+| `Patients_OLD`                   | 2003 | Pre-migration archive; audit demanded retention in 2006   |
+| `Patient_Photos_DEPRECATED`      | 2002 | Two Crystal Reports `LEFT JOIN` it                        |
+| `Z_Backup_Sessions_2009`         | 2009 | December 2009 disaster snapshot; `Z_` prefix sorts last  |
+
+The `tm_pub_all` publication intentionally **does not include** these
+tables — they are read-only ghosts and produce no WAL events.
 
 ## WAL Event Capture (for the Prolog port)
 
@@ -132,28 +179,38 @@ psql -h localhost -U tm_app -d treatment_mgmt -f db/scenarios/01_clinical_workfl
 # Ctrl-C terminal 1; my_run.wal.jsonl now holds the full trace.
 ```
 
-### Offline fixture
+### Offline fixtures
 
-`db/traces/01_clinical_workflow.wal.jsonl` is a pre-recorded reference
-trace of the full clinical workflow scenario. The Prolog port consumes
-this file directly — no live Postgres needed for model verification.
+Two pre-recorded WAL traces live in `db/traces/`:
 
-The scenario covers all four entities and all relevant lifecycle
-transitions:
+#### `01_clinical_workflow.wal.jsonl` — pre-rot, clean schema
 
-| Txn  | Action                                  | Events |
-|------|-----------------------------------------|--------|
-| 1001 | Register two patients                   | 2 × I  |
-| 1002 | Create treatment plan                   | 1 × I  |
-| 1003 | Approve plan                            | 1 × U  |
-| 1004 | Schedule 4 appointments                 | 4 × I  |
-| 1005 | Check in patient                        | 1 × U  |
-| 1006 | Record session 1 (offsets + magnitude)  | 1 × I  |
-| 1007 | Complete appointment                    | 1 × U  |
-| 1008 | Cancel future appointment               | 1 × U  |
-| 1009 | Update demographics                     | 1 × U  |
+A reference trace of the full clinical workflow against the **original
+1996 schema** (migrations 001–002 only). 31 events across 9 transactions
+(8 inserts, 5 updates). Use this for verifying the Prolog model against
+clean inputs.
 
-Total: 31 lines (9 transactions, 8 inserts, 5 updates).
+#### `02_workflow_postdenorm.wal.jsonl` — post-rot, drift-focused
+
+A trace recorded after migrations 003–011 have been applied. 24 events
+across 8 transactions (3 inserts, 5 updates), each annotated with a
+non-standard `drift_note` field describing which inconsistency the event
+demonstrates:
+
+| Txn  | Drift demonstrated                                                  |
+|------|---------------------------------------------------------------------|
+| 1020 | New patient with all post-2001 columns populated (no drift; baseline) |
+| 1021 | Patient rename → snapshot columns on dependent rows go stale        |
+| 1022 | Insert appointment → snapshot populated by trigger (matches at this moment) |
+| 1023 | Insert session → snapshot captures already-stale parent name        |
+| 1024 | Direct SQL update to offset columns → `OffsetCSV` does not refresh  |
+| 1025 | Plan rename → all `PlanCodeSnap` references go stale                |
+| 1026 | Status → Cancelled, but `IsCancelled` / `WorkflowState` stay (TM-4471) |
+| 1027 | `who_updated` set without touching `UpdatedBy` (Lim-era audit drift) |
+
+The `drift_note` field is a fixture-only annotation, not part of
+wal2json. Real captures from `capture_wal.py` will not include it; the
+Prolog DCG should detect drift directly from the column values.
 
 ## Lifecycle Transitions (DCG-relevant)
 
@@ -179,7 +236,8 @@ event stream the DCG will accept.
 |-------|--------|----------------------------|
 | Lazarus fat client (M1: scaffold) | done | n/a (the source of truth) |
 | Lazarus fat client (M2: all four forms + lifecycle) | done | n/a |
-| Prolog DCG / LTS model | planned | consume `*.wal.jsonl` |
+| Schema rot (M2.5: 25 years of feature creep simulated) | done | `02_workflow_postdenorm.wal.jsonl` |
+| Prolog DCG / LTS model | planned | consume `*.wal.jsonl`; detect drift |
 | Elixir port (Commanded + :eventstore) | planned | replay WAL → derive aggregates |
 
 The same WAL trace fixture verifies all three implementations agree on

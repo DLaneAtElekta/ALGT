@@ -41,6 +41,24 @@ type
     lblEmail:         TLabel;
     edtEmail:         TDBEdit;
     chkActive:        TDBCheckBox;
+    // ------ Post-2001 era controls (added bit by bit) ------------------------
+    // The original tidy two-row layout above ends here. Everything below was
+    // shoehorned in by various developers between 2001 and 2018. We tried to
+    // group it but the QA team complained about scrolling so we just kept
+    // making the form taller.
+    grpAddedFields:   TGroupBox;
+    lblIsActive:      TLabel;
+    cmbIsActive:      TDBComboBox;     // Reports query this. The GUI also writes Active above. Drift.
+    lblMarital:       TLabel;
+    cmbMarital:       TDBComboBox;
+    lblSiteCode:      TLabel;
+    cmbSiteCode:      TDBComboBox;
+    lblInsurance:     TLabel;
+    edtInsCarrier:    TDBEdit;
+    edtPolicyNumber:  TDBEdit;
+    chkConsent1:      TDBCheckBox;     // 2005 form
+    chkConsent2:      TDBCheckBox;     // 2009 revision
+    chkConsent3:      TDBCheckBox;     // 2014 revision
     StatusBar1:       TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -83,6 +101,17 @@ begin
   edtEmail.DataSource        := dmMain.dsPatients;
   chkActive.DataSource       := dmMain.dsPatients;
 
+  // Post-2001 column wiring. Note: chkActive (above) and cmbIsActive (below)
+  // bind to two physically different columns that should agree but don't.
+  cmbIsActive.DataSource     := dmMain.dsPatients;
+  cmbMarital.DataSource      := dmMain.dsPatients;
+  cmbSiteCode.DataSource     := dmMain.dsPatients;
+  edtInsCarrier.DataSource   := dmMain.dsPatients;
+  edtPolicyNumber.DataSource := dmMain.dsPatients;
+  chkConsent1.DataSource     := dmMain.dsPatients;
+  chkConsent2.DataSource     := dmMain.dsPatients;
+  chkConsent3.DataSource     := dmMain.dsPatients;
+
   // Hook dataset events on the shared query.
   dmMain.qryPatients.BeforePost   := @qryBeforePost;
   dmMain.qryPatients.AfterPost    := @qryAfterPost;
@@ -115,10 +144,14 @@ end;
 
 procedure TfrmPatient.qryAfterInsert(DataSet: TDataSet);
 begin
-  // Defaults for new rows.
-  DataSet.FieldByName('Sex').AsString := 'U';
-  DataSet.FieldByName('Active').AsBoolean := True;
+  // Defaults for new rows. We set both Active (1996 column) and IsActive
+  // (2001 column) here so they agree at creation time. Subsequent edits
+  // only hit one or the other depending on which control the user touches.
+  DataSet.FieldByName('Sex').AsString      := 'U';
+  DataSet.FieldByName('Active').AsBoolean  := True;
+  DataSet.FieldByName('IsActive').AsString := 'Y';
   DataSet.FieldByName('RowVersion').AsInteger := 1;
+  // SiteCode default left NULL by convention (== MAIN since 2013).
 end;
 
 procedure TfrmPatient.qryBeforePost(DataSet: TDataSet);
