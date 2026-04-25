@@ -68,8 +68,8 @@ extract_actions([], []).
 extract_actions([log(_, _, A, _, _) | Rest], [A | As]) :-
     extract_actions(Rest, As).
 
-sample_pas('samples/modern-lazarus/HelloMUZAQ.pas').
-sample_lfm('samples/modern-lazarus/HelloMUZAQ.lfm').
+sample_pas('../../../pascal_samples/modern-lazarus/HelloMUZAQ.pas').
+sample_lfm('../../../pascal_samples/modern-lazarus/HelloMUZAQ.lfm').
 
 report(Results) :-
     reverse(Results, Ordered),

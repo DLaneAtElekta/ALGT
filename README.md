@@ -91,10 +91,15 @@ ALGT/
 │
 ├── simulators/
 │   ├── clarion/unified/               # Clarion 4GL parser + execution engine
+│   ├── pascal/unified/                # Object Pascal / Lazarus parser + interpreter (MUZAQ)
 │   ├── c34gl/                         #   - C3/4GL variant (prolog + web)
 │   ├── llvm/unified/                  # LLVM IR simulator (Pascal/RADAR target)
 │   ├── fsharp/unified/                # F# simulator
 │   └── common/                        # Shared simulator utilities
+│
+├── pascal_samples/                    # Pascal/Lazarus sample corpus
+│   ├── modern-lazarus/                #   - HelloMUZAQ.{pas,lfm} round-trip target
+│   └── legacy/                        #   - ~404 TP / Modula-2 files (1985–1995)
 │
 ├── clarion_projects/                  # Real Clarion DLL/EXE test cases
 │   ├── hello-world, python-dll        #   - Smoke tests + Python ctypes interop

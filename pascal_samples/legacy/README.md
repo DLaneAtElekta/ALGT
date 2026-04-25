@@ -5,7 +5,7 @@ Modula-2 work, recovered from DOSBox archives and committed here as
 **reference material and future targets** for the Pascal simulator.
 
 The simulator's parser currently targets the Object Pascal / Lazarus
-dialect (see [../../README.md](../../README.md)). These older sources are
+dialect (see [../../simulators/pascal/unified/README.md](../../simulators/pascal/unified/README.md)). These older sources are
 **not** parseable by the current grammar — they use Turbo Pascal 3/5 or
 Logitech Modula-2 dialects. They are included for three reasons:
 
@@ -15,7 +15,7 @@ Logitech Modula-2 dialects. They are included for three reasons:
 2. **Future parser targets** — extending the grammar to the older dialects
    is mechanical; these files give a realistic test corpus.
 3. **Provenance for the MDDT proposal** — the FDA proposal in
-   [/docs/FDA_MDDT_Proposal.md](../../../../docs/FDA_MDDT_Proposal.md)
+   [/docs/FDA_MDDT_Proposal.md](../../docs/FDA_MDDT_Proposal.md)
    argues that the underlying Prolog-based methodology has 20+ years of
    medical device track record. These sources, alongside the 2003 CRUTPr
    provenance, anchor that claim.

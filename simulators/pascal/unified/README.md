@@ -25,7 +25,7 @@ trace comparison.
 | `ui_backend.pl`     | Stub UI backend — records GUI events on the captured-output stream. |
 | `simulator.pl`      | Core interpreter. Loads the module AST, registers forms/objects, fires events, dispatches statements, routes recognised DB ops through `storage_backend`. |
 | `pascal.pl`         | Public API: `load_unit/3`, `fire_event/3`, `invoke_method/5`, `sql_log/2`, `output_lines/2`. |
-| `samples/`          | `HelloMUZAQ.pas` + `HelloMUZAQ.lfm` — minimal one-form, one-button, one-dataset round-trip target. |
+| `../../../pascal_samples/` | Sample corpus at repo root: `modern-lazarus/HelloMUZAQ.{pas,lfm}` is the round-trip target; `legacy/` holds ~404 Turbo Pascal / Modula-2 source files (1985–1995) as reference material. |
 | `test_unified.pl`   | Smoke test. Verifies parse → load → fire OnClick → expected SQL log. |
 
 ## Scope
@@ -75,7 +75,7 @@ ok  fire_click
 ALL TESTS PASSED
 ```
 
-The `fire_click` test loads `samples/HelloMUZAQ.{pas,lfm}`, fires
+The `fire_click` test loads `../../../pascal_samples/modern-lazarus/HelloMUZAQ.{pas,lfm}`, fires
 `click('MainForm', 'Button1')`, and asserts that the SQL transaction log
 contains `[insert, set_field, set_field, post, apply_updates]` — exactly
 the labels that any concurrent observer of the database would see.
@@ -85,7 +85,8 @@ the labels that any concurrent observer of the database would see.
 ```prolog
 :- use_module(pascal).
 
-?- pascal:load_unit('samples/HelloMUZAQ.pas', ['samples/HelloMUZAQ.lfm'], S0).
+?- pascal:load_unit('../../../pascal_samples/modern-lazarus/HelloMUZAQ.pas',
+                    ['../../../pascal_samples/modern-lazarus/HelloMUZAQ.lfm'], S0).
 
 ?- pascal:fire_event(open('MainForm'),               S0, S1),
    pascal:fire_event(click('MainForm', 'Button1'),   S1, S2),
