@@ -1,0 +1,68 @@
+:5
+=========================================================
+ParentFrame:2
+NormalNext:6
+Window:{
+  Position:( 1,24,80,25 )
+  No Box
+}
+DisplayOnly
+---------------------------------------------------------
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ [F1] Previous  [F2] Next  [F3] Summary  [ESC] Submit              NEW REPORT ³
+:6
+=========================================================
+ParentFrame:2
+NormalNext:2
+Window:{
+  Position:( 1,1,80,23 )
+  No Box
+}
+Fields:{
+  (N) 'TickNum' String
+  (P) 'PremDeliv' Real [0-99999]
+  (B) 'PremInch1' Integer [0-100]
+  () 'PremGal1' Display
+  () 'PremInch2' Integer [0-100]
+  (A) 'PremGal2' Display
+  () 'PremDiff' Display
+  (R) 'RegDeliv' Real [0-99999]
+  () 'RegInch1' Integer [0-100]
+  () 'RegGal1' Display
+  () 'RegInch2' Integer [0-100]
+  () 'RegGal2' Display
+  () 'RegDiff' Display
+  (U) 'UnlDeliv' Real [0-99999]
+  () 'UnlInch1' Integer [0-100]
+  () 'UnlGal1' Display
+  () 'UnlInch2' Integer [0-100]
+  () 'UnlGal2' Display
+  () 'UnlDiff' Display
+  () 'Total' Display
+  (D) 'Date' String
+  (T) 'Time' String
+}
+---------------------------------------------------------
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³  D E L I V E R Y   T I C K E T ³                                             ³
+³                                ³ ST. ANDREW`S TEXACO                         ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´ 2000 Campus Drive                           ³
+³  Ticket Number: #           #  ³ St. Charles, MO  63301                      ³
+ÆÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍµ
+³            ³             ³TANK INVEN BEFORE ³TANK INVEN AFTER  ³             ³
+³  PRODUCT   ³  DELIVERED  ³INCHES | GALLONS  ³INCHES | GALLONS  ³ DIFFERENCE  ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³  Premium   ³ #          #³ #    #| #       #³ #    #| #       #³ #         # ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³  Regular   ³ #          #³ #    #| #       #³ #    #| #       #³ #         # ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³  Unleaded  ³ #          #³ #    #| #       #³ #    #| #       #³ #         # ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³  TOTAL     ³ #          #³                                                   ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÂÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³  DATE : #      #  ³                                                          ³
+³  TIME : #      #  ³                                                          ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+
+

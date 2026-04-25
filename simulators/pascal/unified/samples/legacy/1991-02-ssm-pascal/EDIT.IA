@@ -1,0 +1,174 @@
+TYPE
+  LogRec           = RECORD
+    Date           :   DateRec;
+    Total          :   REAL;
+    DataPtr        :   INTEGER;
+    DescriptorPtr  :   INTEGER;
+                     END;
+
+  DataRec          = ARRAY[1..20] of REAL;
+
+
+VAR
+  Log              : ARRAY[0..731] of LogRec;
+  AuxLog           : LogRec;
+  LogFile          : FILE of LogRec;
+  CurrentLog       : INTEGER;
+  LastLog          : INTEGER;
+  SaveToLog        : INTEGER;
+
+  DIRWindow        : BYTE;
+  DIRScreen        : ARRAY[1..52,1..78] of CHAR;
+  Data             : DataRec;
+  AuxData          : DataRec;
+  DataFile         : FILE of DataRec;
+  DIRChanged       : BOOLEAN;
+  CurrentDescriptor: INTEGER;
+
+
+PROCEDURE CreateDIRWindow;
+
+  VAR
+    Count          : INTEGER;
+
+  BEGIN
+    Move(DIRHeader,DIRScreen,SizeOf(DirHeader));
+    FOR Count:=1 to NumberofAccounts DO
+      Move(DIRExpand,DIRScreen[Count*2+8],SizeOf(DIRExpand));
+    Move(DIREnd,DIRScreen[Count*2+10],SizeOf(DIREnd));
+    DIRWindow:=NumberofAccounts*2+11;
+    ChangeWindow(DIRWindow);
+    FOR Count:=1 to NumberofAccounts DO BEGIN
+      WGoto(4,Count*2+8);
+      Write(Usr,Descriptor[Count].Number:8);
+      WGoto(15,Count*2+8);
+      Write(Usr,Descriptor[Count].Name);
+    END;
+  END;
+
+
+PROCEDURE WriteDIR;
+
+  BEGIN
+    WGoto(48,2);
+    Write(Usr,ShortDate(Log[CurrentLog].Date),'    ');
+    FOR I:=1 to NumberofAccounts DO BEGIN
+      WGoto(49,8+I*2);
+      Write(Usr,Data[Descriptor[I].Number]:16:2);
+      IF I<NumberofAccounts THEN BEGIN
+        WGoto(66,8+I*2);
+        IF Log[CurrentLog].Total<>0 THEN
+          Write(Usr,Data[Descriptor[I].Number]/(Log[CurrentLog].Total-Data[NumberofAccounts])*100:9:2)
+        ELSE Write(Usr,'         ');
+      END;
+    END;
+    WGoto(49,10+NumberofAccounts*2);
+    Write(Usr,Log[CurrentLog].Total:16:2);
+  END;
+
+
+PROCEDURE ReTotal(AccountNum : INTEGER;Value : REAL);
+
+  BEGIN
+    WITH Log[CurrentLog] DO BEGIN
+      Total:=Total-Data[AccountNum];
+      Data[AccountNum]:=Value;
+      Total:=Total+Data[AccountNum];
+      WriteDIR;
+    END;
+  END;
+
+
+PROCEDURE EditEdit;
+
+  VAR
+    Place          : INTEGER;
+    YPos           : INTEGER;
+
+  BEGIN
+    Message('EDIT MODE: ESC = Exit');
+    Place:=1;
+    REPEAT
+      YPos:=8+Place*2;
+      GotoLine(YPos-10);
+      HiLiteCell(49,YPos,16);
+      ReadKbd;
+      LoLiteCell(49,YPos,16);
+      CASE Key of
+        #72      : IF Place>1 THEN Place:=Place-1;
+        #80      : IF Place<NumberofAccounts THEN Place:=Place+1;
+        '0'..'9','.' : BEGIN
+                         Val(EnterCell(49,YPos,16,['0'..'9','.']),X,I);
+                         IF NOT DecPoint THEN X:=X/100;
+                         ReTotal(Descriptor[Place].Number,X);
+                         DIRChanged:=TRUE;
+                       END;
+      END;
+      IF Key=#13 THEN Place:=Place+1;
+    UNTIL (Key=#27) OR (Place>NumberofAccounts);
+    Key:=#0;
+    Message('E = Edit  P = Print  ESC = Exit');
+  END;
+
+
+PROCEDURE LoadDIR;
+
+  BEGIN
+    WITH Log[CurrentLog] DO BEGIN
+      IF DataPtr>0 THEN BEGIN
+        ReSet(DataFile);
+        Seek(DataFile,DataPtr-1);
+        Read(DataFile,Data);
+        Close(DataFile);
+        Total:=0;
+        FOR I:=1 to NumberofAccounts DO BEGIN
+          Total:=Total+Data[I];
+        END;
+      END ELSE BEGIN
+        FillChar(Data,SizeOf(Data),0);
+        EditEdit;
+      END;
+    END;
+  END;
+
+
+PROCEDURE SaveLog(ForLog : INTEGER); FORWARD;
+
+
+PROCEDURE SaveDIR;
+
+  BEGIN
+    WITH Log[CurrentLog] DO BEGIN
+      ReSet(DataFile);
+      IF DataPtr<0 THEN DataPtr:=-DataPtr;
+      IF DataPtr=0 THEN DataPtr:=FileSize(DataFile)+1;
+      Seek(DataFile,DataPtr-1);
+      Write(DataFile,Data);
+      Close(DataFile);
+      SaveLog(CurrentLog);
+    END;
+  END;
+
+
+PROCEDURE Edit;
+
+  BEGIN
+    DIRChanged:=FALSE;
+    ChangeWindow(DIRWindow);
+    Message('E = Edit  P = Print  ESC = Exit');
+    LoadDIR;
+    WriteDIR;
+    REPEAT
+      ReadKbd;
+      CASE Key of
+        #72        : GotoLine(TopLine-1);
+        #80        : GotoLine(TopLine+1);
+        #71        : GotoLine(1);
+        #79        : GotoLine(DIRWindow);
+        'e'        : EditEdit;
+        'p'        : PrintWind;
+      END;
+    UNTIL Key=#27;
+    IF DIRChanged THEN SaveDIR;
+  END;
+

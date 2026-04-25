@@ -1,0 +1,482 @@
+   1  ;*****************************************************************************
+ ***** ^ 46, 20
+ *****  ^ 25
+ *  46: MODULE expected
+ *  20: identifier expected
+ *  25: error in block
+
+  24  ;                 error_code corrected, recognition of insufficient
+ *****                       ^ 0
+ *   0: illegal character in source file
+
+  26  ;                 (Comp_Stack, Load_Err_Mem), RTS stack size reduced,
+ *****                       ^ 0         ^ 0 ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  53          public  PC_ID
+ *****                  ^ 0
+ *   0: illegal character in source file
+
+  54          public  critical_section
+ *****                        ^ 0
+ *   0: illegal character in source file
+
+  55          public  START_MEM, MEM_SIZE
+ *****                     ^ 0      ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  56          public  m2_start_mark
+ *****                  ^ 0   ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  57          public  m2_end_mark
+ *****                  ^ 0 ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  58          public  RTS_PROCESS
+ *****                   ^ 0
+ *   0: illegal character in source file
+
+  59          public  cur_proc_addr
+ *****                   ^ 0  ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  60          public  cur_process
+ *****                   ^ 0
+ *   0: illegal character in source file
+
+  61          public  BASE_PAGE_PTR;
+ *****                    ^ 0  ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  62          public  base_page
+ *****                    ^ 0
+ *   0: illegal character in source file
+
+  63          public  SAVED_DISK, RTS_DISK
+ *****                     ^ 0       ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  64          public  device_mask
+ *****                      ^ 0
+ *   0: illegal character in source file
+
+  65          public  error_code
+ *****                     ^ 0
+ *   0: illegal character in source file
+
+  66          public  term_proc_addr
+ *****                    ^ 0  ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  67          public  old_NMI_vector
+ *****                   ^ 0 ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  70          public  DUMMY_ISR
+ *****                     ^ 0
+ *   0: illegal character in source file
+
+  71          public  AFTER_RESIDENT
+ *****                     ^ 0
+ *   0: illegal character in source file
+
+  72          public  RTS_DS
+ *****                   ^ 0
+ *   0: illegal character in source file
+
+  73          public  SYS_RESET
+ *****                   ^ 0
+ *   0: illegal character in source file
+
+  75          public  COMP_STACK
+ *****                    ^ 0
+ *   0: illegal character in source file
+
+  77          public  WRITE_MSG
+ *****                     ^ 0
+ *   0: illegal character in source file
+
+  78          public  WRITE_LN
+ *****                     ^ 0
+ *   0: illegal character in source file
+
+  79          public  WRITE_STATUS
+ *****                     ^ 0
+ *   0: illegal character in source file
+
+  80          public  NORM_ADDR
+ *****                    ^ 0
+ *   0: illegal character in source file
+
+  81          public  GET_CURR_DISK
+ *****                   ^ 0  ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  82          public  SELECT_DISK
+ *****                      ^ 0
+ *   0: illegal character in source file
+
+  85          public  rts_stack_end
+ *****                   ^ 0   ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  90  ;?????????????????????????????????????????????????????????????????????????????
+ ***** ^ 0
+ *****  ^ 0
+ *****   ^ 0
+ *****    ^ 0
+ *****     ^ 0
+ *****      ^ 0
+ *****       ^ 0
+ *****        ^ 0
+ *****         ^ 0
+ *****          ^ 0
+ *****           ^ 0
+ *****            ^ 0
+ *****             ^ 0
+ *****              ^ 0
+ *****               ^ 0
+ *****                ^ 0
+ *****                 ^ 0
+ *****                  ^ 0
+ *****                   ^ 0
+ *****                    ^ 0
+ *****                     ^ 0
+ *****                      ^ 0
+ *****                       ^ 0
+ *****                        ^ 0
+ *****                         ^ 0
+ *****                          ^ 0
+ *****                           ^ 0
+ *****                            ^ 0
+ *****                             ^ 0
+ *****                              ^ 0
+ *****                               ^ 0
+ *****                                ^ 0
+ *****                                 ^ 0
+ *****                                  ^ 0
+ *****                                   ^ 0
+ *****                                    ^ 0
+ *****                                     ^ 0
+ *****                                      ^ 0
+ *****                                       ^ 0
+ *****                                        ^ 0
+ *****                                         ^ 0
+ *****                                          ^ 0
+ *****                                           ^ 0
+ *****                                            ^ 0
+ *****                                             ^ 0
+ *****                                              ^ 0
+ *****                                               ^ 0
+ *****                                                ^ 0
+ *****                                                 ^ 0
+ *****                                                  ^ 0
+ *****                                                   ^ 0
+ *****                                                    ^ 0
+ *****                                                     ^ 0
+ *****                                                      ^ 0
+ *****                                                       ^ 0
+ *****                                                        ^ 0
+ *****                                                         ^ 0
+ *****                                                          ^ 0
+ *****                                                           ^ 0
+ *****                                                            ^ 0
+ *****                                                             ^ 0
+ *****                                                              ^ 0
+ *****                                                               ^ 0
+ *****                                                                ^ 0
+ *****                                                                 ^ 0
+ *****                                                                  ^ 0
+ *****                                                                   ^ 0
+ *****                                                                    ^ 0
+ *****                                                                     ^ 0
+ *****                                                                      ^ 0
+ *****                                                                       ^ 0
+ *****                                                                        ^ 0
+ *****                                                                         ^ 0
+ *****                                                                          ^ 0
+ *****                                                                           ^ 0
+ *****                                                                            ^ 0
+ *****                                                                             ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  91  IF FOR_LOD2EXE
+ ***** ^ 25, 38
+ *****     ^ 27, 48, 27, 28
+ *****      ^ 0
+ *  25: error in block
+ *  38: BEGIN expected
+ *  27: error in expression
+ *  48: error in factor
+ *  27: error in expression
+ *  28: THEN expected
+ *   0: illegal character in source file
+
+  92  ; loader not used
+ *****^ 26, 60, 48, 27, 56, 60, 48, 27, 34
+ *****           ^ 23, 52
+ *  26: ':=' expected
+ *  60: error in FOR statement
+ *  48: error in factor
+ *  27: error in expression
+ *  56: TO expected
+ *  60: error in FOR statement
+ *  48: error in factor
+ *  27: error in expression
+ *  34: DO expected
+ *  23: ';' expected
+ *  52: error in statement sequence
+
+  93  ;?????????????????????????????????????????????????????????????????????????????
+ ***** ^ 0
+ *****  ^ 0
+ *****   ^ 0
+ *****    ^ 0
+ *****     ^ 0
+ *****      ^ 0
+ *****       ^ 0
+ *****        ^ 0
+ *****         ^ 0
+ *****          ^ 0
+ *****           ^ 0
+ *****            ^ 0
+ *****             ^ 0
+ *****              ^ 0
+ *****               ^ 0
+ *****                ^ 0
+ *****                 ^ 0
+ *****                  ^ 0
+ *****                   ^ 0
+ *****                    ^ 0
+ *****                     ^ 0
+ *****                      ^ 0
+ *****                       ^ 0
+ *****                        ^ 0
+ *****                         ^ 0
+ *****                          ^ 0
+ *****                           ^ 0
+ *****                            ^ 0
+ *****                             ^ 0
+ *****                              ^ 0
+ *****                               ^ 0
+ *****                                ^ 0
+ *****                                 ^ 0
+ *****                                  ^ 0
+ *****                                   ^ 0
+ *****                                    ^ 0
+ *****                                     ^ 0
+ *****                                      ^ 0
+ *****                                       ^ 0
+ *****                                        ^ 0
+ *****                                         ^ 0
+ *****                                          ^ 0
+ *****                                           ^ 0
+ *****                                            ^ 0
+ *****                                             ^ 0
+ *****                                              ^ 0
+ *****                                               ^ 0
+ *****                                                ^ 0
+ *****                                                 ^ 0
+ *****                                                  ^ 0
+ *****                                                   ^ 0
+ *****                                                    ^ 0
+ *****                                                     ^ 0
+ *****                                                      ^ 0
+ *****                                                       ^ 0
+ *****                                                        ^ 0
+ *****                                                         ^ 0
+ *****                                                          ^ 0
+ *****                                                           ^ 0
+ *****                                                            ^ 0
+ *****                                                             ^ 0
+ *****                                                              ^ 0
+ *****                                                               ^ 0
+ *****                                                                ^ 0
+ *****                                                                 ^ 0
+ *****                                                                  ^ 0
+ *****                                                                   ^ 0
+ *****                                                                    ^ 0
+ *****                                                                     ^ 0
+ *****                                                                      ^ 0
+ *****                                                                       ^ 0
+ *****                                                                        ^ 0
+ *****                                                                         ^ 0
+ *****                                                                          ^ 0
+ *****                                                                           ^ 0
+ *****                                                                            ^ 0
+ *****                                                                             ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  94  ELSE
+ *****   ^ 40
+ *  40: END expected
+
+  95  ;?????????????????????????????????????????????????????????????????????????????
+ ***** ^ 0
+ *****  ^ 0
+ *****   ^ 0
+ *****    ^ 0
+ *****     ^ 0
+ *****      ^ 0
+ *****       ^ 0
+ *****        ^ 0
+ *****         ^ 0
+ *****          ^ 0
+ *****           ^ 0
+ *****            ^ 0
+ *****             ^ 0
+ *****              ^ 0
+ *****               ^ 0
+ *****                ^ 0
+ *****                 ^ 0
+ *****                  ^ 0
+ *****                   ^ 0
+ *****                    ^ 0
+ *****                     ^ 0
+ *****                      ^ 0
+ *****                       ^ 0
+ *****                        ^ 0
+ *****                         ^ 0
+ *****                          ^ 0
+ *****                           ^ 0
+ *****                            ^ 0
+ *****                             ^ 0
+ *****                              ^ 0
+ *****                               ^ 0
+ *****                                ^ 0
+ *****                                 ^ 0
+ *****                                  ^ 0
+ *****                                   ^ 0
+ *****                                    ^ 0
+ *****                                     ^ 0
+ *****                                      ^ 0
+ *****                                       ^ 0
+ *****                                        ^ 0
+ *****                                         ^ 0
+ *****                                          ^ 0
+ *****                                           ^ 0
+ *****                                            ^ 0
+ *****                                             ^ 0
+ *****                                              ^ 0
+ *****                                               ^ 0
+ *****                                                ^ 0
+ *****                                                 ^ 0
+ *****                                                  ^ 0
+ *****                                                   ^ 0
+ *****                                                    ^ 0
+ *****                                                     ^ 0
+ *****                                                      ^ 0
+ *****                                                       ^ 0
+ *****                                                        ^ 0
+ *****                                                         ^ 0
+ *****                                                          ^ 0
+ *****                                                           ^ 0
+ *****                                                            ^ 0
+ *****                                                             ^ 0
+ *****                                                              ^ 0
+ *****                                                               ^ 0
+ *****                                                                ^ 0
+ *****                                                                 ^ 0
+ *****                                                                  ^ 0
+ *****                                                                   ^ 0
+ *****                                                                    ^ 0
+ *****                                                                     ^ 0
+ *****                                                                      ^ 0
+ *****                                                                       ^ 0
+ *****                                                                        ^ 0
+ *****                                                                         ^ 0
+ *****                                                                          ^ 0
+ *****                                                                           ^ 0
+ *****                                                                            ^ 0
+ *****                                                                             ^ 0
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+ *   0: illegal character in source file
+
+  96  ; FROM LOADER IMPORT
+ *****     ^ 23, 52
+ *  23: ';' expected
+ *  52: error in statement sequence
+
+  97          extrn   LoadProg:NEAR           ; resident loader
+ *****                                                        ^ 23, 52
+ *  23: ';' expected
+ *  52: error in statement sequence
+
+  98          extrn   Load_Err_Mem: near      ; message "insufficient memory"
+ *****                    ^ 0 ^ 5
+ *   0: illegal character in source file
+ *   5: too many errors
+
+

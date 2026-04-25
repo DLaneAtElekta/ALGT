@@ -1,0 +1,37 @@
+MODULES OF RADAR CONTROL TERMINAL:
+
+MODULE Control - Control of remote radar.
+  IMPORTS Serial, TimeDate.
+
+MODULE EGALib - High-level commands for EGA card.
+  IMPORTS InOut, Keyboard.
+  USES IBM EGA Card
+
+MODULE Map - Downloading and displaying map overlays.
+  IMPORTS EGALib, Serial.
+
+MODULE Modem - Controls Hayes-Compatible modem.
+  IMPORTS Serial, Strings.
+
+MODULE Picture - Downloading and displaying picture
+  IMPORTS Control, EGALib, Serial.
+
+MODULE Print - Intercepts PrtSc key for custom screen dump.
+  IMPORTS Devices.
+  USES IBM EGA Card.
+
+MODULE Radar - Main loop of radar program.
+  IMPORTS EGALib, InOut, Modem, Print, ScreenHandler, Store.
+
+MODULE ScreenHandler - Handles all screen elements for radar program.
+  IMPORTS EGALib, InOut, TimeDate.
+
+MODULE Serial - Buffered IO through serial port.
+  IMPORTS Devices.
+  USES IBM Serial Card.
+
+MODULE Store - Storage and retrieval of radar pictures.
+  IMPORTS Control, FileSystem, FileUtility, Map, NumberConversion,
+    Picture, Storage, Strings, TimeDate.
+
+

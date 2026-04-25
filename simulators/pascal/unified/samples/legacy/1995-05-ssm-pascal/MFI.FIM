@@ -1,0 +1,278 @@
+{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}
+{     Daily Liquid Motor Fuel Inventory routines                               }
+{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}
+
+TYPE
+  DLMFIRec     = RECORD
+    FTIInch    :   ARRAY[Regular..Premium] of BYTE;
+    CurrentOS  :   ARRAY[Regular..Premium] of INTEGER;
+    MTD        :   ARRAY[Regular..Premium] of REAL;
+    YTD        :   ARRAY[Regular..Premium] of REAL;
+
+    FTIGall    :   ARRAY[Regular..Premium] of REAL;
+    PrevInv    :   ARRAY[Regular..Premium] of REAL;
+    Deliveries :   ARRAY[Regular..Premium] of REAL;
+    Total      :   ARRAY[Regular..Premium] of REAL;
+    Book       :   ARRAY[Regular..Premium] of REAL;
+    DailyOS    :   ARRAY[Regular..Premium] of INTEGER;
+    PreviousOS :   ARRAY[Regular..Premium] of INTEGER;
+                 END;
+
+  DLMFISRec    = RECORD
+    AccountNum :   STRING[8];
+    FTIInch    :   ARRAY[Regular..Premium] of BYTE;
+    CurrentOS  :   ARRAY[Regular..Premium] of INTEGER;
+    MTD        :   ARRAY[Regular..Premium] of REAL;
+    YTD        :   ARRAY[Regular..Premium] of REAL;
+                 END;
+
+VAR
+  DLMFI        : DLMFIRec;
+  DLMFIChanged : BOOLEAN;
+  DLMFIFile    : FILE of DLMFISRec;
+  DLMFIS       : DLMFISRec ABSOLUTE DLMFI;
+  LastDLMFI    : INTEGER;
+  AuxDLMFI     : DLMFIRec;
+  AuxDLMFIS    : DLMFISRec ABSOLUTE AuxDLMFI;
+
+PROCEDURE CalcDLMFI(ForFuel : fuel);
+
+  BEGIN
+   WITH AuxDLMFI DO
+      FTIGall[ForFuel]:=Stick(FTIInch[ForFuel],ForFuel);
+    WITH DLMFI DO BEGIN
+      YTD[ForFuel]:=AuxDLMFI.YTD[ForFuel]+TR.Sales[ForFuel];
+      MTD[ForFuel]:=AuxDLMFI.MTD[ForFuel]+TR.Sales[ForFuel];
+      FTIGall[ForFuel]:=Stick(FTIInch[ForFuel],ForFuel);
+      Total[ForFuel]:=AuxDLMFI.FTIGall[ForFuel]+Deliveries[ForFuel];
+      Book[ForFuel]:=Total[ForFuel]-TR.Sales[ForFuel];
+      IF ((FTIGall[ForFuel]-Book[ForFuel])>-32767) AND
+         ((FTIGall[ForFuel]-Book[ForFuel])<32767) THEN BEGIN
+        DailyOS[ForFuel]:=Round(FTIGall[ForFuel]-Book[ForFuel]);
+        PreviousOS[ForFuel]:=AuxDLMFI.CurrentOS[ForFuel];
+        CurrentOS[ForFuel]:=DailyOS[ForFuel]+PreviousOS[ForFuel];
+      END;
+    END;
+  END;
+
+
+PROCEDURE WriteDLMFIColumn(ForFuel : fuel);
+
+  BEGIN
+    WITH DLMFI DO BEGIN
+      FOR I:=1 to 8 DO BEGIN
+        WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIPTRPump+I);
+        Write(Usr,TR.Readings[ForFuel,I]:13:0);
+      END;
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIPTRTotal);
+      Write(Usr,TR.Total[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIPTRMeter);
+      Write(Usr,TR.MeterAdj[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIPTRPrev);
+      Write(Usr,TR.Previous[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIPTRSales);
+      Write(Usr,TR.Sales[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIMTD);
+      Write(Usr,DLMFI.MTD[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIYTD);
+      Write(Usr,DLMFI.YTD[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIFTI);
+      Write(Usr,FTIInch[ForFuel]:4);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt+MFIFTIGall,MFIFTI);
+      IF FTIGall[ForFuel]>-1 THEN Write(Usr,FTIGall[ForFuel]:8:0) ELSE Write(Usr,'ERROR':8);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIPrev);
+      Write(Usr,AuxDLMFI.FTIGall[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIDeliv);
+      Write(Usr,Deliveries[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFITotal);
+      Write(Usr,Total[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFISales);
+      Write(Usr,TR.Sales[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIBookInv);
+      Write(Usr,Book[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIActInv);
+      Write(Usr,FTIGall[ForFuel]:13:0);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIDailyOS);
+      Write(Usr,DailyOS[ForFuel]:13);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFIPrevOS);
+      Write(Usr,PreviousOS[ForFuel]:13);
+      WGoto(Ord(ForFuel)*MFIWidth+MFIColumnSt,MFICumOS);
+      Write(Usr,CurrentOS[ForFuel]:13);
+    END;
+  END;
+
+
+PROCEDURE WriteDLMFI;
+
+  BEGIN
+    ChangeWindow(DLMFIWindow);
+    WGoto(MFIDateX,MFIDateY);
+    Write(Usr,ShortDate(Log[CurrentLog].Date));
+    WGoto(MFITimeX,MFITimeY);
+    Write(Usr,ShortTime(Log[CurrentLog].Date));
+    FOR fuelcount:=Regular to Premium DO WriteDLMFIColumn(fuelcount);
+  END;
+
+
+PROCEDURE LoadDLMFI;
+
+  BEGIN
+    CheckFile('MFI.DAT');
+    ReSet(DLMFIFile);
+    IF Log[CurrentLog].Pointer[DLMFIt]>0 THEN BEGIN
+      Seek(DLMFIFile,Log[CurrentLog].Pointer[DLMFIt]-1);
+      Read(DLMFIFile,DLMFIS);
+    END
+    ELSE FillChar(DLMFI,SizeOf(DLMFI),0);
+    I:=CurrentLog-1;
+    WHILE (Log[I].Pointer[DLMFIt]<=0) AND (I>=0) DO I:=I-1;
+    CheckFile('DELIV.DAT');
+    ReSet(DeliveryFile);
+    FillChar(DLMFI.Deliveries,SizeOf(DLMFI.Deliveries),0);
+    FOR J:=I+1 to CurrentLog DO BEGIN
+      IF Log[J].Pointer[Deliveryt]>0 THEN BEGIN
+        Seek(DeliveryFile,Log[J].Pointer[Deliveryt]-1);
+        Read(DeliveryFile,AuxDelivery);
+        FOR fuelcount:=Regular to Premium DO
+          DLMFI.Deliveries[fuelcount]:=DLMFI.Deliveries[fuelcount]+
+            AuxDelivery.GalDeliv[fuelcount];
+      END;
+    END;
+    Close(DeliveryFile);
+    IF I>=0 THEN BEGIN
+      Seek(DLMFIFile,Log[I].Pointer[DLMFIt]-1);
+      Read(DLMFIFile,AuxDLMFIS);
+      IF I<=1 THEN FOR fuelcount:=Regular to Premium DO
+        AuxDLMFI.YTD[fuelcount]:=0;
+      IF Log[I].Date.Month<>Log[CurrentLog].Date.Month THEN
+        FOR fuelcount:=Regular to Premium DO BEGIN
+          AuxDLMFI.MTD[fuelcount]:=0;
+          AuxDLMFI.CurrentOS[fuelcount]:=0;
+        END;
+    END
+    ELSE FillChar(AuxDLMFIS,SizeOf(AuxDLMFIS),0);
+    IF Log[CurrentLog].Pointer[TRt]>0 THEN LoadTR(I) ELSE EnterTR;
+    FOR fuelcount:=Regular to Premium DO CalcDLMFI(fuelcount);
+    Close(DLMFIFile);
+  END;
+
+
+PROCEDURE SaveDLMFI;
+
+  VAR TempLog : INTEGER;
+
+  BEGIN
+    CheckFile('MFI.DAT');
+    ReSet(DLMFIFile);
+    IF Log[CurrentLog].Pointer[DLMFIt]=0 THEN Log[CurrentLog].Pointer[DLMFIt]:=FileSize(DLMFIFile)+1;
+    IF Log[CurrentLog].Pointer[DLMFIt]<0 THEN Log[CurrentLog].Pointer[DLMFIt]:=-Log[CurrentLog].Pointer[DLMFIt];
+    Seek(DLMFIFile,Log[CurrentLog].Pointer[DLMFIt]-1);
+    Write(DLMFIFile,DLMFIS);
+    SaveLog(CurrentLog);
+    TempLog:=CurrentLog;
+    CurrentLog:=CurrentLog+1;
+    WHILE Log[CurrentLog].Date.Year=Log[TempLog].Date.Year DO BEGIN
+      IF Log[CurrentLog].Pointer[DLMFIt]>0 THEN BEGIN
+        LoadDLMFI;
+        Seek(DLMFIFile,Log[CurrentLog].Pointer[DLMFIt]-1);
+        Write(DLMFIFile,DLMFIS);
+      END;
+      CurrentLog:=CurrentLog+1;
+    END;
+    CurrentLog:=TempLog;
+    Close(DLMFIFile);
+  END;
+
+
+PROCEDURE EditDLMFI;
+
+  BEGIN
+    WITH DLMFI DO BEGIN
+      Key:=#0;Escape:=FALSE;
+      WriteEditLine(DLMFIt);
+      GotoLine(32);
+      REPEAT
+        HiLiteCell(Ord(fuelcount)*MFIWidth+MFIColumnSt,MFIFTI,4);
+        ReadKbd;
+        LoLiteCell(Ord(fuelcount)*MFIWidth+MFIColumnSt,MFIFTI,4);
+        CASE Key of
+          #75      : IF fuelcount>Regular THEN fuelcount:=Pred(fuelcount);
+          #77      : IF fuelcount<Premium THEN fuelcount:=Succ(fuelcount);
+          'r'      : IF Log[CurrentLog].Pointer[DLMFIt]<0 THEN BEGIN
+                       Log[CurrentLog].Pointer[DLMFIt]:=-Log[CurrentLog].Pointer[DLMFIt];
+                       LoadDLMFI;
+                       WriteDLMFI;
+                       SaveLog(CurrentLog);
+                       WriteEditLine(DLMFIt);
+                       fuelcount:=Regular;
+                       GotoLine(32);
+                     END;
+          'd'      : IF Log[CurrentLog].Pointer[DLMFIt]>0 THEN BEGIN
+                       Log[CurrentLog].Pointer[DLMFIt]:=-Log[CurrentLog].Pointer[DLMFIt];
+                       SaveLog(CurrentLog);
+                       Key:=#27;
+                       Exit;
+                     END;
+          '0'..'9' : BEGIN
+                       Val(EnterCell(Ord(fuelcount)*MFIWidth+MFIColumnSt,
+                         MFIFTI,4,['0'..'9']),J,I);
+                       IF Line<>'' THEN BEGIN
+                         DLMFIChanged:=TRUE;
+                         FTIInch[fuelcount]:=J;
+                         CalcDLMFI(fuelcount);
+                         WriteDLMFIColumn(fuelcount);
+                       END;
+                     END;
+        END;
+        IF Key=#13 THEN
+          IF fuelcount<Premium THEN BEGIN
+            fuelcount:=Succ(fuelcount);
+          END
+          ELSE Key:=#27;
+      UNTIL Key=#27;
+      LoLiteCell(Ord(fuelcount)*MFIWidth+MFIColumnSt,MFIFTI,4);
+      Key:=#0;
+      WriteKeyLine;
+    END;
+  END;
+
+
+
+
+PROCEDURE EnterDLMFI;
+
+  BEGIN
+    OneMoment;
+    IF Log[CurrentLog].Pointer[DLMFIt]<=0 THEN IF NOT ChangeStatus THEN Exit;
+    DLMFIChanged:=FALSE;
+    LoadDLMFI;
+    WriteDLMFI;
+    fuelcount:=Regular;
+    IF Log[CurrentLog].Pointer[DLMFIt]<=0 THEN EditDLMFI;
+    WriteKeyLine;
+    REPEAT
+      ReadKbd;
+      CASE Key of
+        #72 : GotoLine(TopLine-1);
+        #80 : GotoLine(TopLine+1);
+        #71 : GotoLine(1);
+        #79 : GotoLine(CurWind^.YSize);
+        'e' : IF ChangeStatus THEN BEGIN
+                EditDLMFI;
+                WriteKeyLine;
+              END;
+        'p' : BEGIN
+                PrintWind;
+                WriteKeyLine;
+              END;
+        'd' : IF Log[CurrentLog].Pointer[DLMFIt]>0 THEN
+              IF ChangeStatus THEN BEGIN
+                Log[CurrentLog].Pointer[DLMFIt]:=-Log[CurrentLog].Pointer[DLMFIt];
+                SaveLog(CurrentLog);
+                Key:=#27;
+              END;
+      END;
+    UNTIL Key=#27;
+    IF DLMFIChanged THEN SaveDLMFI;
+    DrawLog;
+  END;

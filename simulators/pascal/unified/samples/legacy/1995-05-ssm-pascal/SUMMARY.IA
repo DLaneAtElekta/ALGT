@@ -1,0 +1,78 @@
+PROCEDURE MonthSummary;
+
+  VAR TotalStore   : REAL;
+
+  BEGIN
+    ChangeWindow(DIRWindow);
+    Message('P = Print  ESC = Exit');
+    FOR J:=1 to NumberofAccounts DO Data[J]:=0;
+    ReSet(DataFile);
+    I:=CurrentLog;
+    REPEAT
+      IF Log[I].DataPtr>0 THEN BEGIN
+        Seek(DataFile,Log[I].DataPtr-1);
+        Read(DataFile,AuxData);
+        FOR J:=1 to NumberofAccounts DO Data[J]:=Data[J]+AuxData[J];
+      END;
+      I:=I-1;
+    UNTIL Log[I].Date.Month<>Log[CurrentLog].Date.Month;
+    TotalStore:=Log[CurrentLog].Total; Log[CurrentLog].Total:=0;
+    FOR I:=1 to NumberofAccounts DO Log[CurrentLog].Total:=Log[CurrentLog].Total+Data[I];
+    WriteDIR;
+    WGoto(3,2);Write(Usr,'MONTHLY SUMMARY       ');
+    WGoto(42,2);Write(Usr,'MONTH: ',MonthNames[Log[CurrentLog].Date.Month],
+      ', as of ',ShortDate(Log[CurrentLog].Date));
+    REPEAT
+      ReadKbd;
+      CASE Key of
+        #72        : GotoLine(TopLine-1);
+        #80        : GotoLine(TopLine+1);
+        #71        : GotoLine(1);
+        #79        : GotoLine(DIRWindow);
+        'p'        : PrintWind;
+      END;
+    UNTIL Key=#27;
+    WGoto(3,2);Write(Usr,'DAILY INCOME REPORT');
+    WGoto(42,2);Write(Usr,'DATE:                             ');
+    Log[CurrentLog].Total:=TotalStore;
+  END;
+
+
+PROCEDURE YearSummary;
+
+  VAR TotalStore   : REAL;
+
+  BEGIN
+    ChangeWindow(DIRWindow);
+    Message('P = Print  ESC = Exit');
+    FOR J:=1 to NumberofAccounts DO Data[J]:=0;
+    ReSet(DataFile);
+    I:=CurrentLog;
+    REPEAT
+      IF Log[I].DataPtr>0 THEN BEGIN
+        Seek(DataFile,Log[I].DataPtr-1);
+        Read(DataFile,AuxData);
+        FOR J:=1 to NumberofAccounts DO Data[J]:=Data[J]+AuxData[J];
+      END;
+      I:=I-1;
+    UNTIL I<0;
+    TotalStore:=Log[CurrentLog].Total; Log[CurrentLog].Total:=0;
+    FOR I:=1 to NumberofAccounts DO Log[CurrentLog].Total:=Log[CurrentLog].Total+Data[I];
+    WriteDIR;
+    WGoto(3,2);Write(Usr,'YEARLY SUMMARY       ');
+    WGoto(42,2);Write(Usr,'YEAR: ',Log[CurrentLog].Date.Year,
+      ', as of ',ShortDate(Log[CurrentLog].Date));
+    REPEAT
+      ReadKbd;
+      CASE Key of
+        #72        : GotoLine(TopLine-1);
+        #80        : GotoLine(TopLine+1);
+        #71        : GotoLine(1);
+        #79        : GotoLine(DIRWindow);
+        'p'        : PrintWind;
+      END;
+    UNTIL Key=#27;
+    WGoto(3,2);Write(Usr,'DAILY INCOME REPORT');
+    WGoto(42,2);Write(Usr,'DATE:                             ');
+    Log[CurrentLog].Total:=TotalStore;
+  END;

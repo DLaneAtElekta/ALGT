@@ -1,0 +1,79 @@
+:3
+=========================================================
+ParentFrame:2
+NormalNext:4
+Window:{
+  Position:( 1,24,80,25 )
+  No Box
+}
+DisplayOnly
+---------------------------------------------------------
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³ [F1] Previous  [F2] Next  [F3] Summary  [ESC] Submit              NEW REPORT ³
+:4
+=========================================================
+ParentFrame:2
+NormalNext:2
+Window:{
+  Position:( 1,1,80,23 )
+  No Box
+}
+Fields:{
+  (D) 'Date' String
+  (T) 'Time' String
+  (S) 'Shift' Integer [1-10]
+  () 'Prev1' Display
+  (1) 'Curr1' Integer [0-99999]
+  () 'Diff1' Display
+  () 'Prev2' Display
+  (2) 'Curr2' Integer [0-99999]
+  () 'Diff2' Display
+  () 'Prev3' Display
+  (3) 'Curr3' Integer [0-99999]
+  () 'Diff3' Display
+  () 'Prev4' Display
+  (4) 'Curr4' Integer [0-99999]
+  () 'Diff4' Display
+  () 'Prev5' Display
+  (5) 'Curr5' Integer [0-99999]
+  () 'Diff5' Display
+  () 'Prev6' Display
+  (6) 'Curr6' Integer [0-99999]
+  () 'Diff6' Display
+  () 'Prev7' Display
+  (7) 'Curr7' Integer [0-99999]
+  () 'Diff7' Display
+  () 'Prev8' Display
+  (8) 'Curr8' Integer [0-99999]
+  () 'Diff8' Display
+  () 'Prev9' Display
+  (9) 'Curr9' Integer [0-99999]
+  () 'Diff9' Display
+  () 'Prev10' Display
+  (0) 'Curr10' Integer [0-99999]
+  () 'Diff10' Display
+}
+---------------------------------------------------------
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                 P U M P   T O T A L I Z E R   R E A D I N G S                ³
+ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³  ST. ANDREW`S TEXACO                                     ³  DATE: #       #  ³
+³  2000 Campus Drive                                       ³  TIME: #       #  ³
+³  St. Charles, MO  63301                                  ³ SHIFT: #  #       ³
+ÆÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍµ
+³             ³      PREVIOUS      |       CURRENT      |     DIFFERENCE       ³
+³         PUMPÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´
+³            1³    #           #   |    #           #   |    #           #     ³
+³            2³    #           #   |    #           #   |    #           #     ³
+³            3³    #           #   |    #           #   |    #           #     ³
+³            4³    #           #   |    #           #   |    #           #     ³
+³            5³    #           #   |    #           #   |    #           #     ³
+³            6³    #           #   |    #           #   |    #           #     ³
+³            7³    #           #   |    #           #   |    #           #     ³
+³            8³    #           #   |    #           #   |    #           #     ³
+³            9³    #           #   |    #           #   |    #           #     ³
+³           10³    #           #   ³    #           #   ³    #           #     ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+
+

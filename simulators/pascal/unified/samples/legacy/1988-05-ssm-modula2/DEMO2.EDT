@@ -1,0 +1,138 @@
+(* Top of file DEMO1.EDT *)
+:1
+======================================================
+  Field Mark: # replace
+  Parent Frame: 0 (*The EndCode; means backing up from
+                    this screen takes us back to DOS.*)
+  Window: {
+    Double Box
+    Position( 1,1,80,23 )
+  }
+  Fields: {
+    () '' editor; 9 lines; prompt
+      Enter a note about Sunday
+    () '' editor; 9 lines; prompt
+      Enter a note about Monday
+    () '' editor; 9 lines; prompt
+      Enter a note about Tuesday
+    () '' editor; 9 lines; prompt
+      Enter a note about Wednesday
+    () '' editor; 9 lines; prompt
+      Enter a note about Thursday
+    () '' editor; 9 lines; prompt
+      Enter a note about Friday
+    () '' editor; 9 lines; prompt
+      Enter a note about Saturday
+    () '' editor; 9 lines; prompt
+      Enter a note about the week
+  }
+  Normal Next: 2
+------------------------------------------------------                         
+
+  SUNDAY            ³ MONDAY            ³ TUESDAY           ³ WEDNESDAY        
+ #                 #³#                 #³#                 #³#                #
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+ ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  THURSDAY          ³ FRIDAY            ³ SATURDAY          ³                  
+ #                 #³#                 #³#                 #³#                #
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+                    ³                   ³                   ³                  
+:2                                     
+======================================================
+  Parent Frame: 1                      
+  Normal Next: 0
+  Window: {
+    Double Box
+    Position( 1,1,80,23 )
+    HeadingLine: 4
+  }
+  Fields: {
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+    () '' editor; 3 lines
+  }
+------------------------------------------------------                    
+                              $                $
+ ÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄ
+  SUNDAY    ³MONDAY    ³TUESDAY   ³WEDNESDAY ³THURSDAY  ³FRIDAY    ³SATURDAY
+ ÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄ
+  #        #³#        #³#        #³#        #³#        #³#        #³#        #
+            ³          ³          ³          ³          ³          ³
+            ³          ³          ³          ³          ³          ³
+ ÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄ
+  #        #³#        #³#        #³#        #³#        #³#        #³#        #
+            ³          ³          ³          ³          ³          ³
+            ³          ³          ³          ³          ³          ³
+ ÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄ
+  #        #³#        #³#        #³#        #³#        #³#        #³#        #
+            ³          ³          ³          ³          ³          ³
+            ³          ³          ³          ³          ³          ³
+ ÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄ
+  #        #³#        #³#        #³#        #³#        #³#        #³#        #
+            ³          ³          ³          ³          ³          ³
+            ³          ³          ³          ³          ³          ³
+ ÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄ
+  #        #³#        #³#        #³#        #³#        #³#        #³#        #
+            ³          ³          ³          ³          ³          ³
+            ³          ³          ³          ³          ³          ³
+ ÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄ
+  #        #³#        #³#        #³#        #³#        #³#        #³#        #
+            ³          ³          ³          ³          ³          ³
+            ³          ³          ³          ³          ³          ³
+(* Bottom of file DEMO1.EDT *)         
+                                       
+                                       
+                                       
+
