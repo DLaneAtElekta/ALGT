@@ -1,0 +1,255 @@
+(*******************************)
+(* VIEW ACCOUNT                *)
+(*******************************)
+
+var
+  CurrentEntry : integer;
+  Entry        : array[1..650] of EntryRec;
+  MaxEntry     : integer;
+
+procedure WriteEntry(ForEntry : integer);
+begin
+    with Entry[ForEntry] do begin
+      GotoXY(1,ForEntry-CurrentEntry+AboveEntry);
+      ClrEOL;
+      if (ForEntry<1) or (ForEntry>MaxEntry) then begin
+        Write('         ³                                ³');
+        Write('          ³          ³         ');
+        Exit;
+      end;
+      Write(ShortDate(Date));
+      Write(' ³ ');
+      Write(Description);
+      GotoXY(43,WhereY);
+      if Amount>=0 then
+        Write('³ ',Amount:8:2,' ³          ³ ')
+      else
+        Write('³          ³ ',-Amount:8:2,' ³ ');
+      Write(Balance:8:2);
+    end;
+end;
+
+PROCEDURE HiLiteEntry;
+
+  BEGIN
+    TextColor(HiLite);TextBackground(HiLiteBack);
+    WriteEntry(CurrentEntry);
+    TextColor(NormVid);TextBackground(NormBack);
+  END;
+
+
+PROCEDURE LoLiteEntry;
+
+  BEGIN
+    WriteEntry(CurrentEntry);
+  END;
+
+
+procedure DrawAccount;
+begin
+  ChangeWindow(AccountWindow);
+  Window(4,2,55,5); ClrScr;
+  with Account[CurrentAccount] do begin
+    Writeln('ACCOUNT NUMBER ',Number);
+    Writeln(Name);
+    Writeln(Address);
+    Write(City);
+    GotoXY(40,4); Write(Phone);
+  end;
+  Window(3,8,77,22);
+  FOR J:=CurrentEntry-AboveEntry+1 to CurrentEntry+BelowEntry+1 DO
+    WriteEntry(J);
+  HiLiteEntry;
+end;
+
+PROCEDURE ReCalc;
+BEGIN
+  for J:=CurrentEntry to MaxEntry do
+    with Entry[J] do
+      if J>1 then Balance:=Entry[J-1].Balance+Amount else Balance:=Amount;
+  J:=MaxEntry; X:=Entry[MaxEntry].Balance;
+  Account[CurrentAccount].GT30:=0.0;
+  Account[CurrentAccount].GT60:=0.0;
+  while (X>0.0) and (J>0) do begin
+    if Entry[J].Amount>0 then begin
+      if SubDates(Entry[MaxEntry].Date,Entry[J].Date)>30 then begin
+        if Account[CurrentAccount].GT30=0.0 then
+          Account[CurrentAccount].GT30:=X;
+      end;
+      if SubDates(Entry[MaxEntry].Date,Entry[J].Date)>60 then begin
+        if Account[CurrentAccount].GT60=0.0 then
+          Account[CurrentAccount].GT60:=X;
+      end;
+      X:=X-Entry[J].Amount;
+    end; (* if *)
+    if X>0.0 then J:=J-1;
+  end; (* while *)
+  Account[CurrentAccount].Balance:=Entry[MaxEntry].Balance;
+END; (* ReCalc *)
+
+PROCEDURE DelEntry;
+BEGIN
+  Move(Entry[CurrentEntry+1],Entry[CurrentEntry],
+    Ofs(Entry[MaxEntry+1])-Ofs(Entry[CurrentEntry]));
+  MaxEntry:=MaxEntry-1;
+  ReCalc;
+END; (* DelEntry *)
+
+PROCEDURE EditEntry; (* Edits Entry[CurrentEntry] *)
+var
+  DateStr : String10;
+  AtField : integer;
+  TempEntry : EntryRec;
+BEGIN
+  LoLiteEntry;
+  Window(1,1,80,24);
+  AtField:=1;
+  with Entry[CurrentEntry] do begin
+    repeat
+      case AtField of
+        1 : HiLiteCell(3,WhereY,8);
+        2 : HiLiteCell(14,WhereY,30);
+        3 : HiLiteCell(47,WhereY,8);
+        4 : HiLiteCell(58,WhereY,8);
+      end; (* case *)
+      ReadKbd;
+      case AtField of
+        1 : LoLiteCell(3,WhereY,8);
+        2 : LoLiteCell(14,WhereY,30);
+        3 : LoLiteCell(47,WhereY,8);
+        4 : LoLiteCell(58,WhereY,8);
+      end; (* case *)
+      if escape then
+        case Key of
+          'M' : if AtField<4 then AtField:=AtField+1;
+          'K' : if AtField>1 then AtField:=AtField-1;
+        end
+      else
+        case Key of
+          ^M  : if AtField<5 then AtField:=AtField+1;
+          else begin
+            case AtField of
+              1 : begin
+                    StrA:=EnterCell(3,WhereY,8,['0'..'9','/','-','.']);
+                    ParseDate(StrA,'',Date);
+                  end;
+              2 : Description:=EnterCell(14,WhereY,30,[' '..'~']);
+              3 : begin
+                    StrA:=EnterCell(47,WhereY,8,['0'..'9','.']);
+                    Val(StrA,Amount,I); Amount:=Amount/100;
+                    AtField:=4;
+                  end;
+              4 : begin
+                    StrA:=EnterCell(58,WhereY,8,['0'..'9','.']);
+                    Val(StrA,Amount,I); Amount:=-Amount/100;
+                  end;
+            end; (* case *)
+            Window(3,8,77,22); LoLiteEntry; Window(1,1,80,25);
+            AtField:=AtField+1;
+          end;
+        end; (* case *)
+    until (AtField>4) or (Key=#27);
+  end;
+  Move(Entry[CurrentEntry],TempEntry,SizeOf(EntryRec));
+  DelEntry;
+  J:=MaxEntry;
+  while (CompareDates(Entry[J].Date,TempEntry.Date)>0) and (J>0) do
+    J:=J-1;
+  while (CompareDates(Entry[J].Date,TempEntry.Date)=0) and
+    (Entry[J].Description>TempEntry.Description) do
+    J:=J-1;
+  if J<MaxEntry then
+    Move(Entry[J+1],Entry[J+2],Ofs(Entry[MaxEntry+1])-Ofs(Entry[J+1]));
+  CurrentEntry:=J+1; MaxEntry:=MaxEntry+1;
+  Move(TempEntry,Entry[CurrentEntry],SizeOf(EntryRec));
+  ReCalc;
+END; (* EditEntry *)
+
+PROCEDURE LoadEntries;
+VAR
+  EntryFile : file;
+BEGIN
+  Assign(EntryFile,AccountFileName(CurrentAccount));
+  ReSet(EntryFile,SizeOf(EntryRec));
+  if IOResult=0 then begin
+    Seek(EntryFile,FirstEntry);
+    BlockRead(EntryFile,Entry,FileSize(EntryFile),MaxEntry);
+    Close(EntryFile);
+  end;
+END; (* LoadAccount *)
+
+PROCEDURE SaveEntries;
+VAR
+  EntryFile : file;
+BEGIN
+  Assign(EntryFile,AccountFileName(CurrentAccount));
+  ReSet(EntryFile,SizeOf(EntryRec));
+  if IOResult=0 then begin
+    Seek(EntryFile,FirstEntry);
+    BlockWrite(EntryFile,Entry,MaxEntry);
+    Truncate(EntryFile);
+    Close(EntryFile);
+  end;
+END; (* SaveEntries *)
+
+PROCEDURE ViewAccount;
+
+  BEGIN
+    LoadEntries;
+    CurrentEntry:=MaxEntry;
+    DrawAccount;
+    REPEAT
+      ReadKbd;
+      CASE Key of
+        ';'  :  BEGIN
+                  MaxEntry:=MaxEntry+1;
+                  CurrentEntry:=MaxEntry;
+                  DrawAccount;
+                  EditEntry;
+                  DrawAccount;
+                END;
+        '<'  :  BEGIN
+                  DelEntry;
+                  DrawAccount;
+                END;
+        '='  :  BEGIN
+                  EditEntry;
+                  DrawAccount;
+                END;
+        'H'  :  IF CurrentEntry>1 THEN BEGIN
+                  LoLiteEntry;
+                  GotoXY(1,1);
+                  InsLine;
+                  CurrentEntry:=CurrentEntry-1;
+                  WriteEntry(CurrentEntry-AboveEntry+1);
+                  HiLiteEntry;
+                END;
+        'P'  :  IF CurrentEntry<MaxEntry THEN BEGIN
+                  LoLiteEntry;
+                  CurrentEntry:=CurrentEntry+1;
+                  GotoXY(1,1); DelLine;
+                  WriteEntry(CurrentEntry+BelowEntry+1);
+                  HiLiteEntry;
+                END;
+        'G'  :  BEGIN
+                  CurrentEntry:=1;
+                  DrawAccount;
+                END;
+        'O'  :  BEGIN
+                  CurrentEntry:=MaxEntry;
+                  DrawAccount;
+                END;
+        'I'  :  IF CurrentEntry-AboveEntry-BelowEntry>=0 THEN BEGIN
+                  CurrentEntry:=CurrentEntry-AboveEntry-BelowEntry;
+                  DrawAccount;
+                END;
+        'Q'  :  IF CurrentEntry+AboveEntry+BelowEntry<=MaxEntry THEN BEGIN
+                  CurrentEntry:=CurrentEntry+AboveEntry+BelowEntry;
+                  DrawAccount;
+                END;
+      END;
+    UNTIL (Key=#27);
+    SaveEntries;
+    SaveAccount;
+  END;
+

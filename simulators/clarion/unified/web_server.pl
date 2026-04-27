@@ -88,14 +88,14 @@ handle_static(Request) :-
 % Directories to scan for .clw files.
 clw_search_dirs(Dirs) :-
     Dirs = [
-        '../../clarion_projects/python-dll',
-        '../../clarion_projects/sensor-data',
-        '../../clarion_projects/stats-calc',
-        '../../clarion_projects/diagnosis-store',
-        '../../clarion_projects/form-demo',
-        '../../clarion_projects/treatment-offset',
-        '../../clarion_projects/hello-world',
-        '../../clarion_projects/clarion_examples'
+        '../../../clarion_projects/python-dll',
+        '../../../clarion_projects/sensor-data',
+        '../../../clarion_projects/stats-calc',
+        '../../../clarion_projects/diagnosis-store',
+        '../../../clarion_projects/form-demo',
+        '../../../clarion_projects/treatment-offset',
+        '../../../clarion_projects/hello-world',
+        '../../../clarion_projects/clarion_examples'
     ].
 
 %% find_clw_files(-Files) is det.

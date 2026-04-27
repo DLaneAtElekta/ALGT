@@ -45,6 +45,6 @@ form_step(stop, FS0, FS1, DB, DB) :-
     FS1 = FS0.put(win, closed).
 
 %% available_events(+FS, -Events)
-available_events(FS, [start])                  :- FS.win == idle, !.
-available_events(FS, [double, refresh, stop])  :- FS.win == running, !.
+available_events(FS, [start])                 :- FS.win == idle, !.
+available_events(FS, [double, refresh, stop]) :- FS.win == running, !.
 available_events(_, []).

@@ -5,18 +5,18 @@
 %% Exposes the c34gl engine as a REST API on port 8183.
 %%
 %% Endpoints:
-%% POST /api/c34gl/sessions → create session
-%% GET /api/c34gl/sessions/:id → get full state
-%% POST /api/c34gl/sessions/:id/step/:formId → step one form
-%% POST /api/c34gl/sessions/:id/reset → reset to initial
-%% GET /api/c34gl/sessions/:id/tape → tape only
-%% GET /api/c34gl/sessions/:id/tables/:table → materialized table
-%% DELETE /api/c34gl/sessions/:id → destroy
+%%   POST   /api/c34gl/sessions                      → create session
+%%   GET    /api/c34gl/sessions/:id                   → get full state
+%%   POST   /api/c34gl/sessions/:id/step/:formId      → step one form
+%%   POST   /api/c34gl/sessions/:id/reset             → reset to initial
+%%   GET    /api/c34gl/sessions/:id/tape              → tape only
+%%   GET    /api/c34gl/sessions/:id/tables/:table     → materialized table
+%%   DELETE /api/c34gl/sessions/:id                   → destroy
 %%
 %% Usage:
-%% $ cd ALGT/simulators/c34gl/prolog
-%% $ swipl session_server.pl
-%% Server starts automatically on port 8183.
+%%   $ cd ALGT/simulators/c34gl/prolog
+%%   $ swipl session_server.pl
+%%   Server starts automatically on port 8183.
 %% =============================================================================
 
 :- module(session_server, [start_server/1, stop_server/0]).
@@ -41,7 +41,7 @@
 %% Session Storage
 %% =============================================================================
 
-:- dynamic session_state/2. %% session_state(SessionId, C34glState)
+:- dynamic session_state/2.    %% session_state(SessionId, C34glState)
 
 new_session(SessionId, State) :-
     uuid(SessionId),
@@ -68,9 +68,9 @@ destroy_session(SessionId) :-
 start_server(Port) :-
     http_server(http_dispatch, [port(Port)]),
     format("~`=t~60|~n", []),
-    format(" c34gl server on http://localhost:~w~n", [Port]),
-    format(" UI: http://localhost:~w/static/index.html~n", [Port]),
-    format(" CORS enabled~n", []),
+    format("  c34gl server on http://localhost:~w~n", [Port]),
+    format("  UI: http://localhost:~w/static/index.html~n", [Port]),
+    format("  CORS enabled~n", []),
     format("~`=t~60|~n", []).
 
 stop_server :- http_stop_server(8183, []).
@@ -113,18 +113,18 @@ serve_static(Request) :-
 %% Session request dispatcher
 handle_sessions(Request) :-
     cors_enable(Request,
-        [methods([get, post, patch, put, delete, options])]),
+                [methods([get, post, patch, put, delete, options])]),
     memberchk(method(Method), Request),
     memberchk(path(Path), Request),
     atom_string(Path, PathStr),
     split_string(PathStr, "/", "/", Parts),
-    ( append(["api","c34gl","sessions"], Tail, Parts)
-    -> catch(
-        route(Method, Tail, Request),
-        Error,
-        handle_error(Error)
-    )
-    ; reply_json_dict(_{error: "Bad path"}, [status(404)])
+    (   append(["api","c34gl","sessions"], Tail, Parts)
+    ->  catch(
+            route(Method, Tail, Request),
+            Error,
+            handle_error(Error)
+        )
+    ;   reply_json_dict(_{error: "Bad path"}, [status(404)])
     ).
 
 handle_error(http_reply(Status)) :- !,
@@ -163,13 +163,13 @@ route(post, [IdStr, "step", FormIdStr], Request) :-
     http_read_json_dict(Request, Body),
     atom_string(Event, Body.event),
     get_session(Id, S0),
-    ( c34gl_engine:step_form(FormId, Event, S0, S1)
-    -> update_session(Id, S1),
-        log("STEP ~w ~w:~w step=~w", [Id, FormId, Event, S1.step_count]),
+    (   c34gl_engine:step_form(FormId, Event, S0, S1)
+    ->  update_session(Id, S1),
+        log("STEP ~w ~w:~w  step=~w", [Id, FormId, Event, S1.step_count]),
         state_to_json(Id, S1, Json),
         reply_json_dict(Json)
-    ; reply_json_dict(_{error: "Invalid step", formId: FormIdStr, event: Body.event},
-        [status(422)])
+    ;   reply_json_dict(_{error: "Invalid step", formId: FormIdStr, event: Body.event},
+                        [status(422)])
     ).
 
 %% POST /sessions/:id/reset — reset
@@ -214,11 +214,11 @@ state_to_json(SessionId, State, Json) :-
     forms_to_json(State, FormsJson),
     tables_to_json(State, TablesJson),
     Json = _{
-        sessionId: SessionId,
-        stepCount: State.step_count,
-        tape: TapeJson,
-        forms: FormsJson,
-        tables: TablesJson
+        sessionId:  SessionId,
+        stepCount:  State.step_count,
+        tape:       TapeJson,
+        forms:      FormsJson,
+        tables:     TablesJson
     }.
 
 tape_to_json(State, TapeJson) :-
@@ -227,10 +227,10 @@ tape_to_json(State, TapeJson) :-
 
 tape_entry_to_json(E, Json) :-
     Json = _{
-        txId: E.tx_id,
-        spid: E.spid,
-        op: E.op,
-        table: E.table,
+        txId:    E.tx_id,
+        spid:    E.spid,
+        op:      E.op,
+        table:   E.table,
         summary: E.summary
     }.
 
@@ -245,19 +245,19 @@ form_pair_to_json(State, FormId-FS, FormId-Json) :-
     maplist(atom_string, AvailEvents, AvailStrs),
     maplist(atom_string, HistChron, HistStrs),
     Json = _{
-        formId: FormId,
-        spid: FS.spid,
-        win: FS.win,
-        locals: FS.locals,
-        lastTx: FS.last_tx,
-        history: HistStrs,
-        availableEvents: AvailStrs
+        formId:           FormId,
+        spid:             FS.spid,
+        win:              FS.win,
+        locals:           FS.locals,
+        lastTx:           FS.last_tx,
+        history:          HistStrs,
+        availableEvents:  AvailStrs
     }.
 
 tables_to_json(State, TablesJson) :-
-    ( materialize_table(State, counter, Rows)
-    -> TablesJson = _{counter: Rows}
-    ; TablesJson = _{counter: []}
+    (   materialize_table(State, counter, Rows)
+    ->  TablesJson = _{counter: Rows}
+    ;   TablesJson = _{counter: []}
     ).
 
 

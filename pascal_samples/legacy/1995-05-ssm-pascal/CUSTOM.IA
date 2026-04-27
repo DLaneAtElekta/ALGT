@@ -1,0 +1,87 @@
+CONST
+  SerialNumber     = '102';
+
+  DIRHeader        : ARRAY[1..9,1..78] of CHAR =(
+'ษออออออออออออออออออออออออออออออออออออออัอออออออออออออออออออออออออออออออออออออป',
+'บ DAILY INCOME REPORT                  ณ DATE:                               บ',
+'ฬออออออออออออออออออออออออออออออออออออออฯอออออออออออออออออออออออออออออออออออออน',
+'บ ST. ANDREW`S TEXACO                                                        บ',
+'บ 2000 Campus Drive                                                          บ',
+'บ St. Charles, MO  63301                                                     บ',
+'วฤฤฤฤฤฤฤฤฤฤฤยฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤยฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤยฤฤฤฤฤฤฤฤฤฤฤฤถ',
+'บ ACCOUNT # ณ ACCOUNT NAME                     ณ AMOUNT         ณ PERCENT    บ',
+'วฤฤฤฤฤฤฤฤฤฤฤลฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤลฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤลฤฤฤฤฤฤฤฤฤฤฤฤถ');
+
+  DIRExpand        : ARRAY[1..2,1..78] of CHAR =(
+'บ           ณ                                  ณ                ณ            บ',
+'วฤฤฤฤฤฤฤฤฤฤฤลฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤลฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤลฤฤฤฤฤฤฤฤฤฤฤฤถ');
+
+  DIREnd           : ARRAY[1..2,1..78] of CHAR =(
+'บ           ณ                           TOTAL  ณ                ณ            บ',
+'ศอออออออออออฯออออออออออออออออออออออออออออออออออฯออออออออออออออออฯออออออออออออผ');
+
+
+  IAWindow         : BYTE = 22;
+  IAScreen         : ARRAY[1..22,1..78] of CHAR =(
+'ษอออออออออออออออออออออออออออออออออออออออัออออออออออออออออออออออออออออออออออออป',
+'บ INCOME ACCOUNT                        ณ DATE                      TOTAL    บ',
+'วฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤด                                    บ',
+'บ ST. ANDREW`S TEXACO                   ณ                                    บ',
+'บ 2000 Campus Drive                     ณ                                    บ',
+'บ St. Charles, MO  63301                ณ                                    บ',
+'วฤฤฤฤฤฤฤยฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤด                                    บ',
+'บ PRESS ณ                               ณ                                    บ',
+'วฤฤฤฤฤฤฤมฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤด                                    บ',
+'บ    F1 : Edit Entry                    ณ                                    บ',
+'บ    F2 : Month-to-Date                 ณ                                    บ',
+'บ    F3 : Year-to-Date                  ณ                                    บ',
+'บ       :                               ณ                                    บ',
+'บ    G  : Goto Entry                    ณ                                    บ',
+'บ    I  : Insert Entry                  ณ                                    บ',
+'บ    N  : New Date                      ณ                                    บ',
+'บ    D  : Delete Entry                  ณ                                    บ',
+'บ       :                               ณ                                    บ',
+'บ       :                               ณ                                    บ',
+'วฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤด                                    บ',
+'บ                                       ณ                                    บ',
+'ศอออออออออออออออออออออออออออออออออออออออฯออออออออออออออออออออออออออออออออออออผ');
+  AboveLog     = 8;
+  BelowLog     = 9;
+  LogWindSize  = 19;
+  UXLog        = 42;
+  UYLog        = 3;
+  LXLog        = 77;
+  LYLog        = 21;
+
+
+TYPE
+  DescriptorRec    = ARRAY [1..20] of RECORD
+    Name           :   STRING[40];
+    Number         :   INTEGER;
+                     END;
+
+
+CONST
+  NumberofAccounts : BYTE = 10;
+  Descriptor       : DescriptorRec =(
+    (Name:'Gasoline'                     ;Number: 1),
+    (Name:'Oil'                          ;Number: 2),
+    (Name:'Accessories'                  ;Number: 3),
+    (Name:'Labor'                        ;Number: 4),
+    (Name:'MiniMart'                     ;Number: 5),
+    (Name:'Emissions'                    ;Number: 6),
+    (Name:'Kerosene'                     ;Number: 7),
+    (Name:'Wrecker'                      ;Number: 8),
+    (Name:'ROA'                          ;Number: 9),
+    (Name:'Tax'                          ;Number:10),
+    (Name:''                             ;Number: 0),
+    (Name:''                             ;Number: 0),
+    (Name:''                             ;Number: 0),
+    (Name:''                             ;Number: 0),
+    (Name:''                             ;Number: 0),
+    (Name:''                             ;Number: 0),
+    (Name:''                             ;Number: 0),
+    (Name:''                             ;Number: 0),
+    (Name:''                             ;Number: 0),
+    (Name:''                             ;Number: 0));
+

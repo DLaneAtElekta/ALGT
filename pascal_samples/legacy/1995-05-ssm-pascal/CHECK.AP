@@ -1,0 +1,139 @@
+const
+     NumNameOnes : array[0..19] of string[10] =
+              ('zero ', 'one ', 'two ', 'three ', 'four ', 'five ',
+               'six ', 'seven ', 'eight ', 'nine ', 'ten ',
+               'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ',
+               'sixteen ', 'seventeen ', 'eighteen ', 'nineteen ');
+    NumNameTens : array[2..9] of string[10] =
+              ('twenty ', 'thirty ', 'forty ', 'fifty ',
+               'sixty ', 'seventy ', 'eighty ', 'ninety ');
+
+function NumberText(ForNum : real) : LineType;
+var
+   Text, FracStr : LineType;
+begin
+     Text := '';
+     if (ForNum >= 1000) then
+     begin
+         FracStr := NumberText(Trunc(ForNum / 1000 + 0.01));
+         FracStr := Copy(FracStr, 1, Length(FracStr)-9);
+         Text := FracStr + 'thousand ';
+         ForNum := ForNum - (Trunc(ForNum/1000 + 0.01)*1000);
+                {had to jerryrig the Trunc function}
+     end;
+     if (ForNum >= 100) then
+     begin
+         Text := Text + NumNameOnes[Trunc(ForNum/100 + 0.01)] + 'hundred ';
+         ForNum := ForNum - ((Trunc(ForNum/100 + 0.01))*100);
+     end;
+     if (ForNum >= 20) then
+     begin
+         Text := Text + NumNameTens[Trunc(ForNum/10 + 0.01)];
+         ForNum := ForNum - ((Trunc(ForNum/10 + 0.01))*10);
+     end;
+
+     if ((Text = '') or ((Trunc(ForNum + 0.01)) > 0)) then
+        Text := Text + NumNameOnes[Trunc(ForNum + 0.01)];
+
+     Str(Abs(-0.01+Frac(ForNum + 0.01))*100:0:0, FracStr);
+                               { had to jerryrig the Frac function }
+     if (Length(FracStr) = 1) then
+        FracStr := '0' + FracStr;
+
+     Text := Text + 'and ' + FracStr + '/100';
+
+    NumberText := Text;
+end;
+
+
+procedure PrintAccount;
+var
+  AmountText : LineType;
+begin
+  LoadEntries;
+  with Account[CurrentAccount] do begin
+{    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst); }
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    AmountText := NumberText(Entry[MaxEntry].Balance);
+    AmountText[1] := UpCase(AmountText[1]);
+    WriteLn(Lst, '       ', AmountText,
+        Copy('                                                     ',1,53-Length(AmountText)),
+        ShortDate(TodaysDate), '      ',
+        Entry[MaxEntry].Balance:6:2);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    { WriteLn(Lst,'       Account #', Number);  {Line 8}
+    WriteLn(Lst,'       ', Name);
+    WriteLn(Lst,'       ', Address);
+    WriteLn(Lst,'       ', City);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);
+    WriteLn(Lst);   {Line 46}
+  end; (* with *)
+  (* Create the payment entry *)
+
+{  CurrentEntry:=MaxEntry;
+  while (Entry[CurrentEntry].Date.Month=Entry[MaxEntry].Date.Month) and
+    (CurrentEntry>=1) do
+    CurrentEntry:=CurrentEntry-1;
+    WriteLn(Lst,'  ', );
+  WriteLn(Lst,'                                        ---------------------------');
+  WriteLn(Lst,'                                        PREVIOUS BALANCE : ',
+    Entry[CurrentEntry].Balance:8:2);
+  WriteLn(Lst,'                                        ---------------------------');
+  WriteLn(Lst);
+  WriteLn(Lst,'          DATE     DESCRIPTION                       DEBIT   CREDIT');
+  WriteLn(Lst,'          ---------------------------------------------------------');
+  while CurrentEntry<MaxEntry do begin
+    CurrentEntry:=CurrentEntry+1;
+    with Entry[CurrentEntry] do begin
+      Write(Lst,'          ',ShortDate(Date),' ');
+      Write(Lst,Description);
+      Write(Lst,Copy('                               ',1,31-Length(Description)));
+      if Amount>=0 then
+        Writeln(Lst,Amount:8:2,' ')
+      else
+        Writeln(Lst,'         ',-Amount:8:2);
+    end;
+  end;
+  WriteLn(Lst,'          ---------------------------------------------------------');
+  Write(Lst,'                                                 BALANCE : ');
+  WriteLn(Lst,Entry[CurrentEntry].Balance:8:2);
+  Write(Lst,^L); }
+end;
+
+
+

@@ -1,0 +1,17 @@
+object MainForm: TMainForm
+  Left = 100
+  Top = 100
+  Caption = 'MUZAQ Patient Entry'
+  Width = 320
+  Height = 240
+  object Button1: TButton
+    Left = 16
+    Top = 16
+    Caption = 'Save'
+    OnClick = Button1Click
+  end
+  object MyDataSet: TSQLQuery
+    Left = 16
+    Top = 64
+  end
+end

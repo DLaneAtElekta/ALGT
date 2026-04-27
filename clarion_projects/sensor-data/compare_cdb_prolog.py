@@ -83,7 +83,7 @@ def run_prolog_trace():
         os.remove(dat)
 
     result = subprocess.run(
-        ["swipl", "-g", "main,halt", "-t", "halt(1)", "trace_sensorlib.pl"],
+        ["swipl", "-g", "main,halt", "-t", "halt(1)", "traces/trace_sensorlib.pl"],
         capture_output=True, text=True, timeout=30,
         cwd=PROLOG_DIR
     )

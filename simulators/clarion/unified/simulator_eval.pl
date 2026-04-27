@@ -30,8 +30,11 @@ eval_expr(true, _, 1).
 eval_expr(false, _, 0).
 
 % Handle Clarion constants (EVENT:xxx, BUTTON:xxx, ICON:xxx, PROP:xxx)
-eval_expr(var(Name), _, Name) :-
-    is_clarion_constant(Name), !.
+% Clarion runtime constants (EVENT:Accepted etc.) — look up as variable first,
+% fall back to atom if not defined (legacy behavior)
+eval_expr(var(Name), State, Value) :-
+    is_clarion_constant(Name), !,
+    ( get_var(Name, State, Value) -> true ; Value = Name ).
 
 % Variable lookup
 eval_expr(var(Name), State, Value) :-

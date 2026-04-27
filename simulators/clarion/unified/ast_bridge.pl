@@ -442,6 +442,7 @@ bridge_expr(gte(A, B), binop('>=', BA, BB)) :- !, bridge_expr(A, BA), bridge_exp
 % Logical operators
 bridge_expr(and(A, B), binop(and, BA, BB)) :- !, bridge_expr(A, BA), bridge_expr(B, BB).
 bridge_expr(or(A, B), binop(or, BA, BB)) :- !, bridge_expr(A, BA), bridge_expr(B, BB).
+bridge_expr(not(A), not(BA)) :- !, bridge_expr(A, BA).
 
 % String concatenation
 bridge_expr(concat(A, B), binop('&', BA, BB)) :- !, bridge_expr(A, BA), bridge_expr(B, BB).

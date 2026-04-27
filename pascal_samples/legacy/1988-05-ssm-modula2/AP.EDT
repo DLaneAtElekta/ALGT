@@ -1,0 +1,351 @@
+=========================================================
+:CopyrightNotice
+Colors:{
+  NormalText   = (15,1) Plain
+  Border       = (9,1)  Plain
+  PointerBar   = (15,4) ReverseVideo
+  Prompts      = (9,0)  Plain
+  Messages     = (9,0)  Plain
+  SelectedText = (14,1) Bold
+
+  ! = (14,1) Bold
+}
+
+(* Copyright Notice:
+     Only displayed at very beginning *)
+ParentFrame:0
+NormalNext:MainMenu
+Window:{
+  Position:( 1,24,80,25 )
+  No Box
+}
+---------------------------------------------------------
+旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
+� (C) Copyright 1985, 1988  D. G. Lane                                 SN102   �
+
+=========================================================
+:MainMenu
+ParentFrame:0
+NormalNext:MainMenu
+
+Window:{
+  Position:( 1,1,80,23 )
+  No Box
+  HeadingLine:9
+}
+
+FieldMark:# replace
+Fields:{
+  () 'FromDate' string
+  () 'ToDate' string
+  () 'PageNum' string
+
+  () 'AccNo1' integer [0..9999999]
+  () 'Name1' string
+  () 'Balance1' real [0..999999]
+  () 'ThirtyDay1' real [0..999999]
+  () 'SixtyDay1' real [0..999999]
+
+  () 'AccNo2' integer [0..9999999]
+  () 'Name2' string
+  () 'Balance2' real [0..999999]
+  () 'ThirtyDay2' real [0..999999]
+  () 'SixtyDay2' real [0..999999]
+
+  () 'AccNo3' integer [0..9999999]
+  () 'Name3' string
+  () 'Balance3' real [0..999999]
+  () 'ThirtyDay3' real [0..999999]
+  () 'SixtyDay3' real [0..999999]
+
+  () 'AccNo4' integer [0..9999999]
+  () 'Name4' string
+  () 'Balance4' real [0..999999]
+  () 'ThirtyDay4' real [0..999999]
+  () 'SixtyDay4' real [0..999999]
+
+  () 'AccNo5' integer [0..9999999]
+  () 'Name5' string
+  () 'Balance5' real [0..999999]
+  () 'ThirtyDay5' real [0..999999]
+  () 'SixtyDay5' real [0..999999]
+
+  () 'AccNo6' integer [0..9999999]
+  () 'Name6' string
+  () 'Balance6' real [0..999999]
+  () 'ThirtyDay6' real [0..999999]
+  () 'SixtyDay6' real [0..999999]
+
+  () 'AccNo7' integer [0..9999999]
+  () 'Name7' string
+  () 'Balance7' real [0..999999]
+  () 'ThirtyDay7' real [0..999999]
+  () 'SixtyDay7' real [0..999999]
+
+  () 'AccNo8' integer [0..9999999]
+  () 'Name8' string
+  () 'Balance8' real [0..999999]
+  () 'ThirtyDay8' real [0..999999]
+  () 'SixtyDay8' real [0..999999]
+
+  () 'AccNo9' integer [0..9999999]
+  () 'Name9' string
+  () 'Balance9' real [0..999999]
+  () 'ThirtyDay9' real [0..999999]
+  () 'SixtyDay9' real [0..999999]
+
+  () 'AccNo10' integer [0..9999999]
+  () 'Name10' string
+  () 'Balance10' real [0..999999]
+  () 'ThirtyDay10' real [0..999999]
+  () 'SixtyDay10' real [0..999999]
+
+  () 'AccNo11' integer [0..9999999]
+  () 'Name11' string
+  () 'Balance11' real [0..999999]
+  () 'ThirtyDay11' real [0..999999]
+  () 'SixtyDay11' real [0..999999]
+
+  () 'AccNo12' integer [0..9999999]
+  () 'Name12' string
+  () 'Balance12' real [0..999999]
+  () 'ThirtyDay12' real [0..999999]
+  () 'SixtyDay12' real [0..999999]
+
+  () 'AccNo13' integer [0..9999999]
+  () 'Name13' string
+  () 'Balance13' real [0..999999]
+  () 'ThirtyDay13' real [0..999999]
+  () 'SixtyDay13' real [0..999999]
+
+  () 'AccNo14' integer [0..9999999]
+  () 'Name14' string
+  () 'Balance14' real [0..999999]
+  () 'ThirtyDay14' real [0..999999]
+  () 'SixtyDay14' real [0..999999]
+
+  () 'AccNo15' integer [0..9999999]
+  () 'Name15' string
+  () 'Balance15' real [0..999999]
+  () 'ThirtyDay15' real [0..999999]
+  () 'SixtyDay15' real [0..999999]
+
+  () 'AccNo16' integer [0..9999999]
+  () 'Name16' string
+  () 'Balance16' real [0..999999]
+  () 'ThirtyDay16' real [0..999999]
+  () 'SixtyDay16' real [0..999999]
+
+  () 'AccNo17' integer [0..9999999]
+  () 'Name17' string
+  () 'Balance17' real [0..999999]
+  () 'ThirtyDay17' real [0..999999]
+  () 'SixtyDay17' real [0..999999]
+
+  () 'AccNo18' integer [0..9999999]
+  () 'Name18' string
+  () 'Balance18' real [0..999999]
+  () 'ThirtyDay18' real [0..999999]
+  () 'SixtyDay18' real [0..999999]
+
+  () 'AccNo19' integer [0..9999999]
+  () 'Name19' string
+  () 'Balance19' real [0..999999]
+  () 'ThirtyDay19' real [0..999999]
+  () 'SixtyDay19' real [0..999999]
+
+  () 'AccNo20' integer [0..9999999]
+  () 'Name20' string
+  () 'Balance20' real [0..999999]
+  () 'ThirtyDay20' real [0..999999]
+  () 'SixtyDay20' real [0..999999]
+
+  () 'AccNo21' integer [0..9999999]
+  () 'Name21' string
+  () 'Balance21' real [0..999999]
+  () 'ThirtyDay21' real [0..999999]
+  () 'SixtyDay21' real [0..999999]
+
+  () 'AccNo22' integer [0..9999999]
+  () 'Name22' string
+  () 'Balance22' real [0..999999]
+  () 'ThirtyDay22' real [0..999999]
+  () 'SixtyDay22' real [0..999999]
+
+  () 'AccNo23' integer [0..9999999]
+  () 'Name23' string
+  () 'Balance23' real [0..999999]
+  () 'ThirtyDay23' real [0..999999]
+  () 'SixtyDay23' real [0..999999]
+
+  () 'AccNo24' integer [0..9999999]
+  () 'Name24' string
+  () 'Balance24' real [0..999999]
+  () 'ThirtyDay24' real [0..999999]
+  () 'SixtyDay24' real [0..999999]
+
+  () 'AccNo25' integer [0..9999999]
+  () 'Name25' string
+  () 'Balance25' real [0..999999]
+  () 'ThirtyDay25' real [0..999999]
+  () 'SixtyDay25' real [0..999999]
+
+  () 'AccNo26' integer [0..9999999]
+  () 'Name26' string
+  () 'Balance26' real [0..999999]
+  () 'ThirtyDay26' real [0..999999]
+  () 'SixtyDay26' real [0..999999]
+
+  () 'AccNo27' integer [0..9999999]
+  () 'Name27' string
+  () 'Balance27' real [0..999999]
+  () 'ThirtyDay27' real [0..999999]
+  () 'SixtyDay27' real [0..999999]
+
+  () 'AccNo28' integer [0..9999999]
+  () 'Name28' string
+  () 'Balance28' real [0..999999]
+  () 'ThirtyDay28' real [0..999999]
+  () 'SixtyDay28' real [0..999999]
+
+  () 'AccNo29' integer [0..9999999]
+  () 'Name29' string
+  () 'Balance29' real [0..999999]
+  () 'ThirtyDay29' real [0..999999]
+  () 'SixtyDay29' real [0..999999]
+
+  () 'AccNo30' integer [0..9999999]
+  () 'Name30' string
+  () 'Balance30' real [0..999999]
+  () 'ThirtyDay30' real [0..999999]
+  () 'SixtyDay30' real [0..999999]
+
+  () 'AccNo31' integer [0..9999999]
+  () 'Name31' string
+  () 'Balance31' real [0..999999]
+  () 'ThirtyDay31' real [0..999999]
+  () 'SixtyDay31' real [0..999999]
+
+  () 'AccNo32' integer [0..9999999]
+  () 'Name32' string
+  () 'Balance32' real [0..999999]
+  () 'ThirtyDay32' real [0..999999]
+  () 'SixtyDay32' real [0..999999]
+
+  () 'AccNo33' integer [0..9999999]
+  () 'Name33' string
+  () 'Balance33' real [0..999999]
+  () 'ThirtyDay33' real [0..999999]
+  () 'SixtyDay33' real [0..999999]
+
+  () 'AccNo34' integer [0..9999999]
+  () 'Name34' string
+  () 'Balance34' real [0..999999]
+  () 'ThirtyDay34' real [0..999999]
+  () 'SixtyDay34' real [0..999999]
+
+  () 'AccNo35' integer [0..9999999]
+  () 'Name35' string
+  () 'Balance35' real [0..999999]
+  () 'ThirtyDay35' real [0..999999]
+  () 'SixtyDay35' real [0..999999]
+
+  () 'AccNo36' integer [0..9999999]
+  () 'Name36' string
+  () 'Balance36' real [0..999999]
+  () 'ThirtyDay36' real [0..999999]
+  () 'SixtyDay36' real [0..999999]
+
+  () 'AccNo37' integer [0..9999999]
+  () 'Name37' string
+  () 'Balance37' real [0..999999]
+  () 'ThirtyDay37' real [0..999999]
+  () 'SixtyDay37' real [0..999999]
+
+  () 'AccNo38' integer [0..9999999]
+  () 'Name38' string
+  () 'Balance38' real [0..999999]
+  () 'ThirtyDay38' real [0..999999]
+  () 'SixtyDay38' real [0..999999]
+
+  () 'AccNo39' integer [0..9999999]
+  () 'Name39' string
+  () 'Balance39' real [0..999999]
+  () 'ThirtyDay39' real [0..999999]
+  () 'SixtyDay39' real [0..999999]
+
+  () 'AccNo40' integer [0..9999999]
+  () 'Name40' string
+  () 'Balance40' real [0..999999]
+  () 'ThirtyDay40' real [0..999999]
+  () 'SixtyDay40' real [0..999999]
+
+  () 'AccNo41' integer [0..9999999]
+  () 'Name41' string
+  () 'Balance41' real [0..999999]
+  () 'ThirtyDay41' real [0..999999]
+  () 'SixtyDay41' real [0..999999]
+
+  () 'AccNo42' integer [0..9999999]
+  () 'Name42' string
+  () 'Balance42' real [0..999999]
+  () 'ThirtyDay42' real [0..999999]
+  () 'SixtyDay42' real [0..999999]
+
+}
+---------------------------------------------------------
+
+                              ACCOUNTS PAYABLE SUMMARY
+
+컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+                               St. Andrew's Texaco
+                               2000 Campus Drive
+                               St. Charles, MO  63301
+컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+   FROM #       #TO #       #                                      PAGE #  #
+컴컴컴컴컴컫컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴쩡컴컴컴컴컴쩡컴컴컴컴컴쩡컴컴컴컴컴
+   ACC NUM � NAME                           �   BALANCE �    30 DAY �    60 DAY
+袴袴袴袴袴曲袴袴袴袴袴袴袴袴袴袴袴袴袴袴袴袴妄袴袴袴袴袴妄袴袴袴袴袴妄袴袴袴袴袴
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+   #      #| #                             #| #        #| #        #| #        #
+컴컴컴컴컴컨컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴좔컴컴컴컴컴좔컴컴컴컴컴좔컴컴컴컴컴

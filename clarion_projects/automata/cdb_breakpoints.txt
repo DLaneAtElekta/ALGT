@@ -1,0 +1,15 @@
+* CDB breakpoint script for AutomataLib.dll tracing
+* Wait for AutomataLib.dll to load, then set breakpoints
+sxe ld:AutomataLib
+g
+.echo *** CDB: AutomataLib.dll loaded, setting breakpoints ***
+bu AutomataLib!CAInit ".echo TRACE_ENTER CAInit; gu; .echo TRACE_EXIT CAInit eax=; r eax; gc"
+bu AutomataLib!CASetRule ".echo TRACE_ENTER CASetRule; .echo   arg1(index)=; dd esp+4 L1; .echo   arg2(value)=; dd esp+8 L1; gu; .echo TRACE_EXIT CASetRule eax=; r eax; gc"
+bu AutomataLib!CAGetRule ".echo TRACE_ENTER CAGetRule; .echo   arg1(index)=; dd esp+4 L1; gu; .echo TRACE_EXIT CAGetRule eax=; r eax; gc"
+bu AutomataLib!CASetCell ".echo TRACE_ENTER CASetCell; .echo   arg1(index)=; dd esp+4 L1; .echo   arg2(value)=; dd esp+8 L1; gu; .echo TRACE_EXIT CASetCell eax=; r eax; gc"
+bu AutomataLib!CAGetCell ".echo TRACE_ENTER CAGetCell; .echo   arg1(index)=; dd esp+4 L1; gu; .echo TRACE_EXIT CAGetCell eax=; r eax; gc"
+bu AutomataLib!CAStep ".echo TRACE_ENTER CAStep; gu; .echo TRACE_EXIT CAStep eax=; r eax; gc"
+bu AutomataLib!CASpatialEntropy ".echo TRACE_ENTER CASpatialEntropy; gu; .echo TRACE_EXIT CASpatialEntropy eax=; r eax; gc"
+bu AutomataLib!CAGetCellCount ".echo TRACE_ENTER CAGetCellCount; .echo   arg1(state)=; dd esp+4 L1; gu; .echo TRACE_EXIT CAGetCellCount eax=; r eax; gc"
+.echo *** CDB: Breakpoints set, continuing ***
+g

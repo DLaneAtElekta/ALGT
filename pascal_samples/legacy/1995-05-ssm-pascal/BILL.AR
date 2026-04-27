@@ -1,0 +1,52 @@
+procedure PrintAccount;
+begin
+  LoadEntries;
+  with Account[CurrentAccount] do begin
+    WriteLn(Lst,'                               S T A T E M E N T');
+    WriteLn(Lst);
+    WriteLn(Lst,'------------------------------------------------------------------------------');
+    WriteLn(Lst,'  St. Andrew`s Texaco');
+    WriteLn(Lst,'  2000 Campus Drive');
+    WriteLn(Lst,'  St. Charles, MO  63301');
+    WriteLn(Lst,'------------------------------------------------------------------------------');
+    WriteLn(Lst);
+    WriteLn(Lst,'                           **** DUE BY THE 10th ****');
+    WriteLn(Lst);
+    WriteLn(Lst,'      ACCOUNT #',Number,
+      '                           DATE : ',ShortDate(Entry[MaxEntry].Date));
+    WriteLn(Lst,'      ',Name);
+    WriteLn(Lst,'      ',Address);
+    WriteLn(Lst,'      ',City);
+    WriteLn(Lst);
+  end; (* with *)
+  CurrentEntry:=MaxEntry;
+  while (Entry[CurrentEntry].Date.Month=Entry[MaxEntry].Date.Month) and
+    (CurrentEntry>=1) do
+    CurrentEntry:=CurrentEntry-1;
+  WriteLn(Lst,'                                        ---------------------------');
+  WriteLn(Lst,'                                        PREVIOUS BALANCE : ',
+    Entry[CurrentEntry].Balance:8:2);
+  WriteLn(Lst,'                                        ---------------------------');
+  WriteLn(Lst);
+  WriteLn(Lst,'          DATE     DESCRIPTION                       DEBIT   CREDIT');
+  WriteLn(Lst,'          ---------------------------------------------------------');
+  while CurrentEntry<MaxEntry do begin
+    CurrentEntry:=CurrentEntry+1;
+    with Entry[CurrentEntry] do begin
+      Write(Lst,'          ',ShortDate(Date),' ');
+      Write(Lst,Description);
+      Write(Lst,Copy('                               ',1,31-Length(Description)));
+      if Amount>=0 then
+        Writeln(Lst,Amount:8:2,' ')
+      else
+        Writeln(Lst,'         ',-Amount:8:2);
+    end;
+  end;
+  WriteLn(Lst,'          ---------------------------------------------------------');
+  Write(Lst,'                                                 BALANCE : ');
+  WriteLn(Lst,Entry[CurrentEntry].Balance:8:2);
+  Write(Lst,^L);
+end;
+
+
+

@@ -104,25 +104,27 @@ function renderFormPanel(formId, d) {
   const localLabel = formId === 'incrementer' ? 'count' : 'value';
 
   return `
-    <div class="form-panel ${formId}">
-      <div class="form-title">
-        ${formId === 'incrementer' ? 'Incrementer' : 'Doubler'}
-        <span class="spid-badge">${f.spid}</span>
-      </div>
-      <div class="form-body">
-        ${renderDCGDiagram(formId, f.win)}
-        <div class="locals">${localLabel} = ${localsStr}</div>
-        <div class="events">
-          ${f.availableEvents.map(e =>
-            `<button data-form="${formId}" data-event="${e}">${e}</button>`
-          ).join('')}
+    <div class="form-column">
+      <div class="form-panel ${formId}">
+        <div class="form-title">
+          ${formId === 'incrementer' ? 'Incrementer' : 'Doubler'}
+          <span class="spid-badge">${f.spid}</span>
         </div>
-        <div class="history">
-          ${f.history.length > 0
-            ? f.history.slice(-6).join(' &rarr; ')
-            : '<em>no events yet</em>'}
+        <div class="form-body">
+          <div class="locals">${localLabel} = ${localsStr}</div>
+          <div class="events">
+            ${f.availableEvents.map(e =>
+              `<button data-form="${formId}" data-event="${e}">${e}</button>`
+            ).join('')}
+          </div>
+          <div class="history">
+            ${f.history.length > 0
+              ? f.history.slice(-6).join(' &rarr; ')
+              : '<em>no events yet</em>'}
+          </div>
         </div>
       </div>
+      ${renderDCGDiagram(formId, f.win)}
     </div>`;
 }
 
@@ -139,7 +141,7 @@ function renderDCGDiagram(formId, currentWin) {
     return `<span class="${cls}">${s}</span>`;
   }).join('<span class="dcg-arrow">&rarr;</span>');
 
-  return `<div class="dcg-diagram">${nodes}</div>`;
+  return `<div class="dcg-diagram ${formId}">${nodes}</div>`;
 }
 
 // =============================================================================
@@ -173,9 +175,9 @@ function renderTape(d) {
   // Head position indicators on minimap (shown as labels)
   const headLabels = [];
   if (d.forms.incrementer && d.forms.incrementer.lastTx !== 'none')
-    headLabels.push(`<span class="head-indicator head-a">▲ A @ #${d.forms.incrementer.lastTx}</span>`);
+    headLabels.push(`<span class="head-indicator head-a">\u25B2 A @ #${d.forms.incrementer.lastTx}</span>`);
   if (d.forms.doubler && d.forms.doubler.lastTx !== 'none')
-    headLabels.push(`<span class="head-indicator head-b">▲ B @ #${d.forms.doubler.lastTx}</span>`);
+    headLabels.push(`<span class="head-indicator head-b">\u25B2 B @ #${d.forms.doubler.lastTx}</span>`);
   const headsHtml = headLabels.length > 0
     ? `<div class="tape-heads-inline">${headLabels.join(' ')}</div>` : '';
 
@@ -212,51 +214,133 @@ function renderTable(d) {
 }
 
 // =============================================================================
-// LLM Observer Panel
+// LLM Chat Panel — Ollama (qwen3:30b)
 // =============================================================================
 
+const OLLAMA_URL = 'http://localhost:11434/api/chat';
+const OLLAMA_MODEL = 'qwen3:30b';
+let chatHistory = [];  // {role, content}
+let chatBusy = false;
+
 function renderLLMPanel(d) {
-  const commentary = generateCommentary(d);
+  const messages = chatHistory
+    .filter(m => m.role !== 'system')
+    .map(m => {
+      const cls = m.role === 'assistant' ? 'chat-msg assistant' : 'chat-msg user';
+      const avatarSrc = AVATAR_DATA_URL || SEAGULL_IMG;
+      const avatar = m.role === 'assistant'
+        ? `<img src="${avatarSrc}" class="chat-avatar-img">`
+        : '<span class="chat-avatar user-avatar">You</span>';
+      return `<div class="${cls}">${avatar}<div class="chat-bubble">${escHtml(m.content)}</div></div>`;
+    }).join('');
+
   return `
-    <div class="llm-panel">
-      <img src="${SEAGULL_IMG}" alt="c34gl" class="llm-avatar">
-      <div class="llm-text">${commentary}</div>
+    <div class="chat-panel">
+      <div class="chat-header">
+        <span class="chat-model">${OLLAMA_MODEL}</span>
+      </div>
+      <div class="chat-messages" id="chat-messages">${messages}</div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-input" class="chat-input"
+               placeholder="Ask about the tape, forms, or interleaving..."
+               ${chatBusy ? 'disabled' : ''}
+               onkeydown="if(event.key==='Enter')sendChat()">
+        <button onclick="sendChat()" class="chat-send" ${chatBusy ? 'disabled' : ''}>
+          ${chatBusy ? '...' : 'Send'}
+        </button>
+      </div>
     </div>`;
 }
 
-function generateCommentary(d) {
-  const tape = d.tape || [];
+function buildSystemPrompt(d) {
+  const tape = (d.tape || []).map(e =>
+    `${e.txId}|${fnDblogOp(e.op).trim()}|${e.spid||'NULL'}|${e.table}|${e.summary}`
+  ).join('\n');
   const counter = (d.tables && d.tables.counter && d.tables.counter[0]) || {};
   const inc = d.forms.incrementer;
   const dbl = d.forms.doubler;
+  return `You are the C34GL observer — a concise analyst of concurrent form interactions on a shared transaction log (Turing machine tape metaphor).
 
-  if (d.stepCount === 0) {
-    return 'Counter initialized to 0. Both forms are idle. Start one to begin.';
+Current state:
+- counter table: value = ${counter.value ?? '?'}
+- Incrementer: win=${inc.win}, locals.count=${inc.locals.count}, lastTx=${inc.lastTx}
+- Doubler: win=${dbl.win}, locals.value=${dbl.locals.value}, lastTx=${dbl.lastTx}
+- Step count: ${d.stepCount}
+
+fn_dblog (transaction log / tape):
+seq|Operation|SPID|Table|Summary
+${tape || '(empty)'}
+
+Be brief (1-3 sentences). Point out stale reads, lost updates, or interleaving anomalies when relevant. Use fn_dblog terminology.`;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg || chatBusy) return;
+
+  chatHistory.push({ role: 'user', content: msg });
+  input.value = '';
+  chatBusy = true;
+  render();
+
+  try {
+    // Build messages with fresh system prompt
+    const sysPrompt = buildSystemPrompt(state.data);
+    const messages = [
+      { role: 'system', content: sysPrompt },
+      ...chatHistory
+    ];
+
+    const res = await fetch(OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: OLLAMA_MODEL, messages, stream: false })
+    });
+
+    if (!res.ok) throw new Error(`Ollama ${res.status}`);
+    const data = await res.json();
+    const reply = data.message?.content || '(no response)';
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    chatHistory.push({ role: 'assistant', content: `Error: ${e.message}. Is Ollama running?` });
   }
 
-  const parts = [];
-  parts.push(`Counter is <strong>${counter.value}</strong> after ${d.stepCount} step${d.stepCount !== 1 ? 's' : ''}.`);
+  chatBusy = false;
+  render();
+  // Scroll chat to bottom
+  const el = document.getElementById('chat-messages');
+  if (el) el.scrollTop = el.scrollHeight;
+}
 
-  // Detect stale read potential
-  if (inc && inc.win === 'running' && dbl && dbl.win === 'running') {
-    if (inc.locals.count !== counter.value) {
-      parts.push(`Incrementer's local count (${inc.locals.count}) is stale — tape shows ${counter.value}.`);
-    }
-    if (dbl.locals.value !== counter.value) {
-      parts.push(`Doubler's local value (${dbl.locals.value}) is stale — tape shows ${counter.value}.`);
-    }
-  }
+// Auto-notify LLM after each step
+async function notifyLLMOfStep(formId, event) {
+  if (chatHistory.length === 0) return; // only if chat is active
+  const sysPrompt = buildSystemPrompt(state.data);
+  const autoMsg = `[${formId} fired "${event}" — step ${state.data.stepCount}]`;
+  chatHistory.push({ role: 'user', content: autoMsg });
+  chatBusy = true;
+  render();
 
-  // Last event
-  if (tape.length > 1) {
-    const last = tape[tape.length - 1];
-    if (last.op === 'update') {
-      const who = last.spid === 'spid_a' ? 'Incrementer' : 'Doubler';
-      parts.push(`Last write by ${who}: ${last.summary}`);
+  try {
+    const messages = [
+      { role: 'system', content: sysPrompt },
+      ...chatHistory
+    ];
+    const res = await fetch(OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: OLLAMA_MODEL, messages, stream: false })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      chatHistory.push({ role: 'assistant', content: data.message?.content || '' });
     }
-  }
-
-  return parts.join(' ');
+  } catch (_) {}
+  chatBusy = false;
+  render();
+  const el = document.getElementById('chat-messages');
+  if (el) el.scrollTop = el.scrollHeight;
 }
 
 // =============================================================================
@@ -280,16 +364,16 @@ function attachHandlers() {
 
 const MINIMAP_COLORS = {
   // Per-token colors (fn_dblog syntax highlighting)
-  seq: '#6b7688', // dim gray for sequence number
-  op: '#ff7b72', // red-orange for LOP_ operation keywords
-  tran: '#79c0ff', // light blue for transaction/spid name
-  tbl: '#c084fc', // purple for table name
-  note: '#ffa657', // orange for (UNDO) annotations
-  pipe: '#3a4250', // dim for pipe delimiters
+  seq:     '#6b7688',   // dim gray for sequence number
+  op:      '#ff7b72',   // red-orange for LOP_ operation keywords
+  tran:    '#79c0ff',   // light blue for transaction/spid name
+  tbl:     '#c084fc',   // purple for table name
+  note:    '#ffa657',   // orange for (UNDO) annotations
+  pipe:    '#3a4250',   // dim for pipe delimiters
   // Per-SPID gutter colors
-  spid_a: '#3b82f6',
-  spid_b: '#10b981',
-  seed: '#6b7688',
+  spid_a:  '#3b82f6',
+  spid_b:  '#10b981',
+  seed:    '#6b7688',
   unknown: '#4a5568'
 };
 
@@ -298,9 +382,9 @@ function drawMinimap() {
   const lines = window._minimapData;
   if (!canvas || !lines || lines.length === 0) return;
 
-  const PX = 2; // pixels per character
-  const LINE_H = 3; // pixels per line
-  const GUTTER = 4; // gutter width for SPID color bar
+  const PX = 2;            // pixels per character
+  const LINE_H = 3;        // pixels per line
+  const GUTTER = 4;        // gutter width for SPID color bar
   const maxCols = 80;
   const w = GUTTER + maxCols * PX;
   const h = Math.max(lines.length * LINE_H, 6);
@@ -373,11 +457,44 @@ function escHtml(s) {
 
 function truncate(s, n) {
   s = String(s);
-  return s.length > n ? s.slice(0, n) + '…' : s;
+  return s.length > n ? s.slice(0, n) + '\u2026' : s;
+}
+
+// =============================================================================
+// Pre-render cropped avatar at proper resolution
+// =============================================================================
+
+let AVATAR_DATA_URL = null;
+
+function prerenderAvatar() {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const size = 64; // render at 2x for retina
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      // Crop: head is roughly top 40%, centered
+      const srcW = img.width;
+      const srcH = img.height;
+      const cropSize = srcW * 0.62;
+      const sx = (srcW - cropSize) / 2 + srcW * 0.02; // slight left shift
+      const sy = srcH * 0.02;
+      ctx.beginPath();
+      ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, size, size);
+      AVATAR_DATA_URL = canvas.toDataURL('image/png');
+      resolve();
+    };
+    img.onerror = resolve;
+    img.src = SEAGULL_IMG;
+  });
 }
 
 // =============================================================================
 // Init
 // =============================================================================
 
-createSession();
+prerenderAvatar().then(() => createSession());

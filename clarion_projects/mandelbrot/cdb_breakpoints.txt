@@ -1,0 +1,10 @@
+* CDB breakpoint script for FractalLib.dll tracing
+* Wait for FractalLib.dll to load, then set breakpoints
+sxe ld:FractalLib
+g
+.echo *** CDB: FractalLib.dll loaded, setting breakpoints ***
+bu FractalLib!FLMandelbrot ".echo TRACE_ENTER FLMandelbrot; .echo   arg1(cx)=; dd esp+4 L1; .echo   arg2(cy)=; dd esp+8 L1; .echo   arg3(maxIter)=; dd esp+c L1; gu; .echo TRACE_EXIT FLMandelbrot eax=; r eax; gc"
+bu FractalLib!FLJulia ".echo TRACE_ENTER FLJulia; .echo   arg1(zx)=; dd esp+4 L1; .echo   arg2(zy)=; dd esp+8 L1; .echo   arg3(cx)=; dd esp+c L1; .echo   arg4(cy)=; dd esp+10 L1; .echo   arg5(maxIter)=; dd esp+14 L1; gu; .echo TRACE_EXIT FLJulia eax=; r eax; gc"
+bu FractalLib!FLLogistic ".echo TRACE_ENTER FLLogistic; .echo   arg1(p10k)=; dd esp+4 L1; .echo   arg2(k10k)=; dd esp+8 L1; gu; .echo TRACE_EXIT FLLogistic eax=; r eax; gc"
+.echo *** CDB: Breakpoints set, continuing ***
+g

@@ -1,0 +1,44 @@
+Description of modules for Radar terminal program:
+
+EGALib -
+  Interface to EGA card.  Includes point plotting, line drawing,
+character writing, and other goodies.
+
+Modem -
+  Interface to Hayes modem.  Dials number and returns result code.
+
+RS232Int -
+  Buffered RS232 communications.
+
+Control -
+  Control of parameters from radar.
+
+Map - 
+  Downloads and writes maps.
+
+Picture -
+  Downloads and writes radar picture.
+
+Interact -
+  Interactive control of radar, and downloading picture.
+
+Storage1 -
+  Basic storage of phone numbers and map in 1 file.  Used by version 1.x.
+
+Storage2 -
+  Adds picture storage in sub directories.  Used by version 2.x and higher.
+
+Help -
+  Controlled writing of help menues.  Each particular version supplies its own
+help-writing procedure.
+
+Print -
+  Screen dump-revectors interrupt 05.
+
+RangeMarks - 
+  Writes range marks.
+
+Screen -
+  Controls screen elements - messages, parameters, range marks, maps, etc.
+
+
